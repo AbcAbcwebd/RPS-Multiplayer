@@ -33,13 +33,7 @@
 		var activeUserPath;
 		var currentUserCount = 0;
 		var activeUserList = [];
-/*
-		database.ref().on("value", function(snapshot){
-			console.log(snapshot.val().activeUsers);
-		}, function(error){
-			console.log(error);
-		});
-*/
+
 		function addActiveUserData(newUser) {
 		  firebase.database().ref('activeUsers/' + newUser).set({
 		    name: newUser
@@ -48,14 +42,7 @@
 		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)
 		  activeUserPath.onDisconnect().remove();
 		};
-/*
-		function removeActiveUser() {
-			alert("Disconnecting")
-			if (currentUser.length > 0){
-				firebase.database().ref('activeUsers/' + currentUser).remove();
-			};
-		};
-*/
+
 		// Click functionality goes here
 		$( document ).ready(function() {
 			$("#set-name-button").on("click", function() {
@@ -64,9 +51,9 @@
 				// Validates user input
 				if (userInput.length === 0) {
 					$('#error-display').text("Please enter a valid screen name.");
+				} else if (activeUserList.indexOf(userInput) > -1){
+					$('#error-display').text("Sorry, that name's already taken.");
 				} else {
-					// Ideally there should be an additional else if statement that validates that the chosen name is unique. 
-
 					addActiveUserData(userInput);
 					moveOffPage("account-display");
 				};
@@ -82,24 +69,13 @@
 		    return size;
 		};
 
-		// Get the size of an object
-//		var size = Object.size(myArray);
-
 		database.ref('activeUsers/').on("value", function(snapshot){
 			var activeUsersObj = snapshot.val();
 			currentUserCount = Object.size(activeUsersObj);
-			console.log("Number of users: " + currentUserCount);
-			console.log(activeUsersObj);
 			activeUserList = [];
-
-			//Loops through active users and adds them to an array.
-/*			for (var i = 1; i <= currentUserCount; i++){
-				var thisUser = user + i;
-				console.log(activeUsersObj.thisUser);
-			}; */
 			for (var key in activeUsersObj) {
 			  if (activeUsersObj.hasOwnProperty(key)) {
-			    console.log(key);
+			    activeUserList.push(key);
 			  }
 			}
 		}, function(error){
