@@ -10,9 +10,11 @@ function getUserName(){
 	nameInput.attr("id", "name-input");
 	var submitButton = $('<button>').text("Set Name");
 	submitButton.attr("id", "set-name-button");
+	var errorDisplay = $('<p>').attr("id", "error-display");
 	$('#account-display').append(instructions);
 	$('#account-display').append(nameInput);
 	$('#account-display').append(submitButton);
+	$('#account-display').append(errorDisplay);
 };
 
 

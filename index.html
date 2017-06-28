@@ -59,7 +59,17 @@
 			$("#set-name-button").on("click", function() {
 				event.preventDefault();
 				var userInput = $('#name-input').val();
-				addActiveUserData(userInput);
+				// Validates user input
+				console.log(userInput);
+				console.log(userInput.length);
+				if (userInput.length === 0) {
+					$('#error-display').text("Please enter a valid screen name.");
+				} else {
+					// Ideally there should be an additional else if statement that validates that the chosen name is unique. 
+
+					addActiveUserData(userInput);
+				};
+				
 			});
 		});
 
