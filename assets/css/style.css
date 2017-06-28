@@ -3,14 +3,24 @@
 	width: 275px;
 	max-width: 40%;
 	position: absolute;
+	opacity: 1;
 }
 
 .display-item.horizTranslate {
-	background: red;
 	-webkit-transition: -2.5s;
 	-moz-transition: -2.5s;
 	-ms-transition: -2.5s;
 	-o-transition: -2.5s;
 	transition: -2.5s;
 	left: 15% !important;
+
+	-webkit-transition: opacity 3s ease-in-out;
+    -moz-transition: opacity 3s ease-in-out;
+    -ms-transition: opacity 3s ease-in-out;
+    -o-transition: opacity 3s ease-in-out;
+     opacity: 1;
+
+    visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s 2s, opacity 2s linear;
 }
