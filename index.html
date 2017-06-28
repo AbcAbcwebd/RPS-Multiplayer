@@ -32,6 +32,7 @@
 		var currentUser;
 		var activeUserPath;
 		var currentUserCount = 0;
+		var activeUserList = [];
 /*
 		database.ref().on("value", function(snapshot){
 			console.log(snapshot.val().activeUsers);
@@ -40,7 +41,7 @@
 		});
 */
 		function addActiveUserData(newUser) {
-		  firebase.database().ref('activeUsers/user' + (currentUserCount + 1)).set({
+		  firebase.database().ref('activeUsers/' + newUser).set({
 		    name: newUser
 		  });
 		  currentUser = newUser;
@@ -89,6 +90,18 @@
 			currentUserCount = Object.size(activeUsersObj);
 			console.log("Number of users: " + currentUserCount);
 			console.log(activeUsersObj);
+			activeUserList = [];
+
+			//Loops through active users and adds them to an array.
+/*			for (var i = 1; i <= currentUserCount; i++){
+				var thisUser = user + i;
+				console.log(activeUsersObj.thisUser);
+			}; */
+			for (var key in activeUsersObj) {
+			  if (activeUsersObj.hasOwnProperty(key)) {
+			    console.log(key);
+			  }
+			}
 		}, function(error){
 			console.log(error);
 		});
