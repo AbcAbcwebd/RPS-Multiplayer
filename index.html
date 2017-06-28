@@ -34,6 +34,9 @@
 		var currentUserCount = 0;
 		var activeUserList = [];
 
+		// This keeps track of whether or not we're currently displaying the active user list. 
+		var displayUserList = false;
+
 		function addActiveUserData(newUser) {
 		  firebase.database().ref('activeUsers/' + newUser).set({
 		    name: newUser
@@ -43,12 +46,22 @@
 		  activeUserPath.onDisconnect().remove();
 		};
 
+		function generateActiveUsersList(){
+			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
+			for (var x = 0; x < activeUserList.length; x++){
+				var newP = $('<p>').text(activeUserList[x]);
+				newP.attr("class", "player-list-item");
+				activeUsersDisplay.append(newP);
+			}
+			$('body').append(activeUsersDisplay);
+		};
+
 		// Click functionality goes here
 		$( document ).ready(function() {
 			$("#set-name-button").on("click", function() {
 				event.preventDefault();
 				var userInput = $('#name-input').val();
-				// Validates user input
+				// Validates user input to make sure it's not blank and not a duplicate username.
 				if (userInput.length === 0) {
 					$('#error-display').text("Please enter a valid screen name.");
 				} else if (activeUserList.indexOf(userInput) > -1){
@@ -56,6 +69,8 @@
 				} else {
 					addActiveUserData(userInput);
 					moveOffPage("account-display");
+					generateActiveUsersList();
+					displayUserList = true;
 				};
 				
 			});
@@ -77,6 +92,11 @@
 			  if (activeUsersObj.hasOwnProperty(key)) {
 			    activeUserList.push(key);
 			  }
+			}
+
+			// If the current user list is currently being displayed, it will be updated.
+			if (displayUserList){
+				generateActiveUsersList();
 			}
 		}, function(error){
 			console.log(error);

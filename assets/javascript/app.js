@@ -23,7 +23,3 @@ function moveOffPage(elementID){
 	document.getElementById(elementID).classList.add('invis');
 	$('#' + elementID).empty();
 };
-
-function generateActiveUsersList(){
-	var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
-};
