@@ -47,11 +47,22 @@
 		};
 
 		function generateActiveUsersList(){
+			$('#active-user-display').remove();
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
+			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
+			activeUsersDisplay.append(challengeInstructions);
+			if (activeUserList.length === 0){
+				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
+				activeUsersDisplay.append(noChallengersWarning);
+			};
+			
 			for (var x = 0; x < activeUserList.length; x++){
-				var newP = $('<p>').text(activeUserList[x]);
-				newP.attr("class", "player-list-item");
-				activeUsersDisplay.append(newP);
+				// Adds all active users to list of competitors, except this windows current user.
+				if (activeUserList[x] != currentUser){
+					var newP = $('<p>').text(activeUserList[x]);
+					newP.attr("class", "player-list-item");
+					activeUsersDisplay.append(newP);
+				};
 			}
 			$('body').append(activeUsersDisplay);
 		};
