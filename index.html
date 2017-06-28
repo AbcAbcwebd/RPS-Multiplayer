@@ -24,6 +24,8 @@
 	  firebase.initializeApp(config);
 	</script>
 	<div id="account-display"></div>
+	<div id="main-stage"></div>
+	<div id="message-console"></div>
 
 	<script>
 		getUserName();
@@ -46,8 +48,11 @@
 		  activeUserPath.onDisconnect().remove();
 		};
 
+		// This sets things up for the user to pick a challenger
 		function generateActiveUsersList(){
+			console.log("Generating active user list")
 			$('#active-user-display').remove();
+			console.log("Active user list cleared")
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
 			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
 			activeUsersDisplay.append(challengeInstructions);
@@ -64,7 +69,7 @@
 					activeUsersDisplay.append(newP);
 				};
 			}
-			$('body').append(activeUsersDisplay);
+			$('#main-stage').append(activeUsersDisplay);
 		};
 
 		function initChallenge(target){
@@ -133,11 +138,27 @@
 			var activeChallengesObj = snapshot.val();
 			for (var key in activeChallengesObj) {
 			  if (activeChallengesObj.hasOwnProperty(key)) {
-			    var localChallenger = key.split("-")[0];
-			    var localTarget = key.split("-")[1];
-			    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
-			    	database.ref('activeUChallenges/' + key).remove();
-			    };
+				    var localChallenger = key.split("-")[0];
+				    var localTarget = key.split("-")[1];
+
+				    // This removes open challengs if one or both of the users has left the site.
+				    // Next the function checks to see if the current user is being challenged. 
+				    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
+				    	database.ref('activeUChallenges/' + key).remove();
+				    } else if (localTarget === currentUser){
+				    	// Current user is being challenged! 
+				    	var challengeMessage = $('<p>').attr("class", "message game-message");
+				    	challengeMessage.text("You've been challenged by " + localChallenger + "!");
+				    	var acceptButton = $('<button>').attr('class', 'chat-button accept-button');
+				    	acceptButton.attr('data-attribute', key);
+				    	acceptButton.text("Accept");
+				    	var declineButton = $('<button>').attr('class', 'chat-button decline-button');
+				    	declineButton.attr('data-attribute', key);
+				    	declineButton.text("Decline");
+				    	challengeMessage.append(acceptButton);
+				    	challengeMessage.append(declineButton);
+				    	$('#message-console').append(challengeMessage);
+				    };
 			  };
 			};
 		}, function(error){
