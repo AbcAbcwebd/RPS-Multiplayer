@@ -15,7 +15,10 @@ function getUserName(){
 	$('#account-display').append(nameInput);
 	$('#account-display').append(submitButton);
 	$('#account-display').append(errorDisplay);
+	$('#account-display').attr("class", "display-item");
 };
 
-
-
+function moveOffPage(){
+//	$('#account-display').classList.add('horizTranslate');
+	document.getElementById('account-display').classList.add('horizTranslate');
+}

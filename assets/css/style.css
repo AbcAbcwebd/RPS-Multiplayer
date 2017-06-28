@@ -1,0 +1,16 @@
+#account-display {
+	margin-top: 45px;
+	width: 275px;
+	max-width: 40%;
+	position: absolute;
+}
+
+.display-item.horizTranslate {
+	background: red;
+	-webkit-transition: -2.5s;
+	-moz-transition: -2.5s;
+	-ms-transition: -2.5s;
+	-o-transition: -2.5s;
+	transition: -2.5s;
+	left: 15% !important;
+}

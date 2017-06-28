@@ -43,7 +43,7 @@
 		    name: newUser
 		  });
 		  currentUser = newUser;
-		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)//.child(currentUser);
+		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)
 		  activeUserPath.onDisconnect().remove();
 		};
 
@@ -60,8 +60,6 @@
 				event.preventDefault();
 				var userInput = $('#name-input').val();
 				// Validates user input
-				console.log(userInput);
-				console.log(userInput.length);
 				if (userInput.length === 0) {
 					$('#error-display').text("Please enter a valid screen name.");
 				} else {
@@ -72,14 +70,6 @@
 				
 			});
 		});
-
-		var one = "Dina"
-
-	//	database.ref('activeUsers/' + currentUser).onDisconnect().remove();
-	//	var Disref = firebase.database().ref("activeUsers/Dargus");
-	//	activeUserPath.onDisconnect().set('MoreStuff');
-
-	//	var imagesRef = storageRef.child('images');
 
 	</script>
 </body>
