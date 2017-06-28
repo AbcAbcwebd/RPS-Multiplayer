@@ -31,29 +31,30 @@
 		var database = firebase.database();
 		var currentUser;
 		var activeUserPath;
-
+		var currentUserCount = 0;
+/*
 		database.ref().on("value", function(snapshot){
-			console.log(snapshot);
+			console.log(snapshot.val().activeUsers);
 		}, function(error){
 			console.log(error);
 		});
-
+*/
 		function addActiveUserData(newUser) {
-		  firebase.database().ref('activeUsers/' + newUser).set({
+		  firebase.database().ref('activeUsers/user' + (currentUserCount + 1)).set({
 		    name: newUser
 		  });
 		  currentUser = newUser;
 		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)
 		  activeUserPath.onDisconnect().remove();
 		};
-
+/*
 		function removeActiveUser() {
 			alert("Disconnecting")
 			if (currentUser.length > 0){
 				firebase.database().ref('activeUsers/' + currentUser).remove();
 			};
 		};
-
+*/
 		// Click functionality goes here
 		$( document ).ready(function() {
 			$("#set-name-button").on("click", function() {
@@ -70,6 +71,26 @@
 				};
 				
 			});
+		});
+
+		Object.size = function(obj) {
+		    var size = 0, key;
+		    for (key in obj) {
+		        if (obj.hasOwnProperty(key)) size++;
+		    }
+		    return size;
+		};
+
+		// Get the size of an object
+//		var size = Object.size(myArray);
+
+		database.ref('activeUsers/').on("value", function(snapshot){
+			var activeUsersObj = snapshot.val();
+			currentUserCount = Object.size(activeUsersObj);
+			console.log("Number of users: " + currentUserCount);
+			console.log(activeUsersObj);
+		}, function(error){
+			console.log(error);
 		});
 
 	</script>

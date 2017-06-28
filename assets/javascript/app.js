@@ -25,5 +25,5 @@ function moveOffPage(elementID){
 };
 
 function generateActiveUsersList(){
-
+	var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
 };
