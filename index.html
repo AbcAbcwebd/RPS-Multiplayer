@@ -29,6 +29,7 @@
 		getUserName();
 
 		var database = firebase.database();
+		var currentUser;
 
 		database.ref().on("value", function(snapshot){
 			console.log(snapshot);
@@ -36,13 +37,33 @@
 			console.log(error);
 		});
 
-		function writeUserData() {
-		  firebase.database().ref('users/').set({
-		    username: "name",
-		    email: "email",
-		    profile_picture : "imageUrl"
+		function addActiveUserData(newUser) {
+		  firebase.database().ref('activeUsers/' + newUser).set({
+		    name: newUser
 		  });
-		}
+		  currentUser = newUser;
+		};
+
+		function removeActiveUser() {
+			alert("Disconnecting")
+			if (currentUser.length > 0){
+				firebase.database().ref('activeUsers/' + currentUser).remove();
+			};
+		};
+
+		// Click functionality goes here
+		$( document ).ready(function() {
+			$("#set-name-button").on("click", function() {
+				event.preventDefault();
+				var userInput = $('#name-input').val();
+				addActiveUserData(userInput);
+			});
+		});
+
+		database.ref('activeUsers/' + currentUser).onDisconnect().remove();
+
+		var ref = firebase.database().ref("users/ada/status");
+		ref.onDisconnect().set("I disconnected!");
 
 	</script>
 </body>

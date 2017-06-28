@@ -13,14 +13,7 @@ function getUserName(){
 	$('#account-display').append(instructions);
 	$('#account-display').append(nameInput);
 	$('#account-display').append(submitButton);
-}
+};
 
-// Click functionality goes here
-$( document ).ready(function() {
-	$("#set-name-button").on("click", function() {
-		event.preventDefault();
-		var userInput = $('#name-input').val();
-		console.log(userInput);
-	});
-});
+
 
