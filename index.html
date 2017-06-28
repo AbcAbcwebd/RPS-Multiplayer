@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Rock Paper Scissors - Online Multiplayer</title>
+	<script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+	<script src="assets/javascript/app.js"></script>
+	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+<body>
+	<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyAL9qWQ1BQ1YJzIlDCGKG05Nu_-fZcaLYU",
+	    authDomain: "obe-rock-paper-scissors.firebaseapp.com",
+	    databaseURL: "https://obe-rock-paper-scissors.firebaseio.com",
+	    projectId: "obe-rock-paper-scissors",
+	    storageBucket: "obe-rock-paper-scissors.appspot.com",
+	    messagingSenderId: "291973353413"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+	<div id="account-display"></div>
+
+	<script>
+		getUserName();
+
+		var database = firebase.database();
+
+		database.ref().on("value", function(snapshot){
+			console.log(snapshot);
+		}, function(error){
+			console.log(error);
+		});
+
+		function writeUserData() {
+		  firebase.database().ref('users/').set({
+		    username: "name",
+		    email: "email",
+		    profile_picture : "imageUrl"
+		  });
+		}
+
+	</script>
+</body>
+</html>
