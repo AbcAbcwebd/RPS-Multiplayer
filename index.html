@@ -43,7 +43,8 @@
 		    name: newUser
 		  });
 		  currentUser = newUser;
-		  activeUserPath = 'activeUsers/' + currentUser;
+		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)//.child(currentUser);
+		  activeUserPath.onDisconnect().remove();
 		};
 
 		function removeActiveUser() {
@@ -65,8 +66,10 @@
 		var one = "Dina"
 
 	//	database.ref('activeUsers/' + currentUser).onDisconnect().remove();
-		var Disref = firebase.database().ref(activeUserPath);
-		Disref.onDisconnect().set('MoreStuff');
+	//	var Disref = firebase.database().ref("activeUsers/Dargus");
+	//	activeUserPath.onDisconnect().set('MoreStuff');
+
+	//	var imagesRef = storageRef.child('images');
 
 	</script>
 </body>
