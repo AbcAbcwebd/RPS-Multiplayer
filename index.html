@@ -55,7 +55,7 @@
 				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
 				activeUsersDisplay.append(noChallengersWarning);
 			};
-			
+
 			for (var x = 0; x < activeUserList.length; x++){
 				// Adds all active users to list of competitors, except this windows current user.
 				if (activeUserList[x] != currentUser){
@@ -65,6 +65,15 @@
 				};
 			}
 			$('body').append(activeUsersDisplay);
+		};
+
+		function initChallenge(target){
+			console.log("Recieved: " + target)
+			firebase.database().ref('activeUChallenges/' + currentUser + '-' + target).set({
+				challenger: currentUser,
+				target: target,
+				ChallengeStatus: "is_open"
+			});
 		};
 
 		// Click functionality goes here
@@ -85,6 +94,11 @@
 				};
 				
 			});
+
+			$("body").on("click", "p.player-list-item", function(){
+				var enemyTarget = $(this)[0].innerText;
+				initChallenge(enemyTarget);
+			});
 		});
 
 		Object.size = function(obj) {
@@ -95,6 +109,7 @@
 		    return size;
 		};
 
+		// This interacts with the database and maintains a list of active users.
 		database.ref('activeUsers/').on("value", function(snapshot){
 			var activeUsersObj = snapshot.val();
 			currentUserCount = Object.size(activeUsersObj);
