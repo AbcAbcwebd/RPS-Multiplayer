@@ -18,7 +18,12 @@ function getUserName(){
 	$('#account-display').attr("class", "display-item");
 };
 
-function moveOffPage(){
+function moveOffPage(elementID){
 //	$('#account-display').classList.add('horizTranslate');
-	document.getElementById('account-display').classList.add('horizTranslate');
-}
+	document.getElementById(elementID).classList.add('invis');
+	$('#' + elementID).empty();
+};
+
+function generateActiveUsersList(){
+
+};
