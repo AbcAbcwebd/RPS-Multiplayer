@@ -128,6 +128,22 @@
 			console.log(error);
 		});
 
+		// This keeps tabs on open challenges
+		database.ref('activeUChallenges/').on("value", function(snapshot){
+			var activeChallengesObj = snapshot.val();
+			for (var key in activeChallengesObj) {
+			  if (activeChallengesObj.hasOwnProperty(key)) {
+			    var localChallenger = key.split("-")[0];
+			    var localTarget = key.split("-")[1];
+			    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
+			    	database.ref('activeUChallenges/' + key).remove();
+			    };
+			  };
+			};
+		}, function(error){
+			console.log(error);
+		});
+
 	</script>
 </body>
 </html>
