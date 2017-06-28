@@ -30,6 +30,7 @@
 
 		var database = firebase.database();
 		var currentUser;
+		var activeUserPath;
 
 		database.ref().on("value", function(snapshot){
 			console.log(snapshot);
@@ -42,6 +43,7 @@
 		    name: newUser
 		  });
 		  currentUser = newUser;
+		  activeUserPath = 'activeUsers/' + currentUser;
 		};
 
 		function removeActiveUser() {
@@ -60,10 +62,11 @@
 			});
 		});
 
-		database.ref('activeUsers/' + currentUser).onDisconnect().remove();
+		var one = "Dina"
 
-		var ref = firebase.database().ref("users/ada/status");
-		ref.onDisconnect().set("I disconnected!");
+	//	database.ref('activeUsers/' + currentUser).onDisconnect().remove();
+		var Disref = firebase.database().ref(activeUserPath);
+		Disref.onDisconnect().set('MoreStuff');
 
 	</script>
 </body>
