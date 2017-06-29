@@ -102,11 +102,10 @@
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
 			});
-/*
-			$("body").on("click", "p.player-list-item", function(){
-				var enemyTarget = $(this)[0].innerText;
-				initChallenge(enemyTarget);
-			});*/
+
+			$("body").on("click", "button.accept-button", function(){
+				console.log(this.value);
+			});
 		});
 
 		Object.size = function(obj) {
@@ -157,10 +156,11 @@
 				    	var challengeMessage = $('<p>').attr("class", "message game-message");
 				    	challengeMessage.text("You've been challenged by " + localChallenger + "!");
 				    	var acceptButton = $('<button>').attr('class', 'chat-button accept-button');
-				    	acceptButton.attr('data-attribute', key);
+				    	acceptButton.attr('value', localChallenger);
 				    	acceptButton.text("Accept");
 				    	var declineButton = $('<button>').attr('class', 'chat-button decline-button');
-				    	declineButton.attr('data-attribute', key);
+				    	console.log(localChallenger)
+				    	declineButton.attr('value', localChallenger);
 				    	declineButton.text("Decline");
 				    	challengeMessage.append(acceptButton);
 				    	challengeMessage.append(declineButton);
