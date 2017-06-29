@@ -101,11 +101,11 @@
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
 			});
-
+/*
 			$("body").on("click", "p.player-list-item", function(){
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
-			});
+			});*/
 		});
 
 		Object.size = function(obj) {
@@ -139,18 +139,18 @@
 		database.ref('activeUChallenges/').on("value", function(snapshot){
 			var activeChallengesObj = snapshot.val();
 			for (var key in activeChallengesObj) {
-			  if (activeChallengesObj.hasOwnProperty(key)) {
+			    if (activeChallengesObj.hasOwnProperty(key)) {
 				    var localChallenger = key.split("-")[0];
 				    var localTarget = key.split("-")[1];
-				    var testObj = database.ref('activeUChallenges/')
-				    console.log(activeChallengesObj.child(localChallenger + "-" + localTarget));
+				    var localStatus = key.split("-")[2];
+				    var localPath = activeChallengesObj[localChallenger + "-" + localTarget + "-open"];
 
 				    // This removes open challengs if one or both of the users has left the site.
 				    // Next the function checks to see if the current user is being challenged. 
 				    // The next part checks for responses to open challenges from current user.
 				    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
 				    	database.ref('activeUChallenges/' + key).remove();
-				    } else if (localTarget === currentUser){
+				    } else if (localTarget === currentUser && localStatus === "open"){
 				    	// Current user is being challenged! 
 				    	var challengeMessage = $('<p>').attr("class", "message game-message");
 				    	challengeMessage.text("You've been challenged by " + localChallenger + "!");
@@ -163,10 +163,16 @@
 				    	challengeMessage.append(acceptButton);
 				    	challengeMessage.append(declineButton);
 				    	$('#message-console').append(challengeMessage);
+				    	/*firebase.database().ref('activeUChallenges/' + localChallenger + '-' + localTarget + "-open").remove();
+						firebase.database().ref('activeUChallenges/' + localChallenger + '-' + localTarget + "-recieved").set({
+							challenger: currentUser,
+							target: target,
+							ChallengeStatus: "is_open"
+						}); */
 				    } else if (localChallenger === currentUser){
 				//    	console.log(key.ChallengeStatus);
-				    }
-			  };
+				    };
+			    };
 			};
 		}, function(error){
 			console.log(error);
