@@ -44,7 +44,6 @@
 		    name: newUser
 		  });
 		  currentUser = newUser;
-		  console.log(currentUser + " set")
 		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)
 		  activeUserPath.onDisconnect().remove();
 		};
@@ -147,10 +146,6 @@
 				    var localPath = activeChallengesObj[localChallenger + "-" + localTarget];
 				    var localStatus = localPath.ChallengeStatus;
 
-				    console.log(localTarget);
-				    console.log(currentUser);
-				    console.log(localStatus);
-
 				    // This removes open challengs if one or both of the users has left the site.
 				    // Next the function checks to see if the current user is being challenged. 
 				    // The next part checks for responses to open challenges from current user.
@@ -170,12 +165,11 @@
 				    	challengeMessage.append(acceptButton);
 				    	challengeMessage.append(declineButton);
 				    	$('#message-console').append(challengeMessage);
-				    	/*firebase.database().ref('activeUChallenges/' + localChallenger + '-' + localTarget + "-open").remove();
-						firebase.database().ref('activeUChallenges/' + localChallenger + '-' + localTarget + "-recieved").set({
-							challenger: currentUser,
-							target: target,
-							ChallengeStatus: "is_open"
-						}); */
+
+				    	// This updates the status of the challenge so it is not re-posted.
+						firebase.database().ref('activeUChallenges/' + key).update({
+							ChallengeStatus: "recieved"
+						});
 				    } else if (localChallenger === currentUser){
 				//    	console.log(key.ChallengeStatus);
 				    };
