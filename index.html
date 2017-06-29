@@ -36,6 +36,7 @@
 		var currentUserCount = 0;
 		var activeUserList = [];
 		var gameChallenger;
+		var gamePath;
 
 		// This keeps track of whether or not we're currently displaying the active user list. 
 		var displayUserList = false;
@@ -89,7 +90,9 @@
 		};
 
 		function startGame(){
-
+			console.log("Game function running")
+			$('#main-stage').empty()
+			$('#message-console').empty();
 		};
 
 		// Click functionality goes here
@@ -183,6 +186,19 @@
 								ChallengeStatus: "accepted"
 							});
 
+							// This sets the key that will be used to access game play info.
+							gamePath = currentUser + "-" + gameChallenger;
+
+							// This sets up the object that will manage game play info.
+							firebase.database().ref('activeGames/' + gamePath).set({
+								playerOne: currentUser,
+								playerTwo: gameChallenger,
+								playerOneMove: "waiting",
+								playerTwoMove: "waiting",
+								playerOnePoints: 0,
+								playerTwoPoints: 0
+							});
+
 							startGame();
 						});
 
@@ -203,6 +219,10 @@
 						if (localStatus === "accepted"){
 							printMessage("Game", localTarget + " has accepted your challenge!");
 							gameChallenger = localTarget;
+
+							// This sets the key that will be used to access game play info.
+							gamePath = gameChallenger + "-" + currentUser;
+
 							setTimeout(function() { 
 								startGame();
 							}, 2000);
