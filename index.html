@@ -35,6 +35,7 @@
 		var activeUserPath;
 		var currentUserCount = 0;
 		var activeUserList = [];
+		var gameChallenger;
 
 		// This keeps track of whether or not we're currently displaying the active user list. 
 		var displayUserList = false;
@@ -79,6 +80,18 @@
 			});
 		};
 
+		// This is for displaying messages to the messaging console prior to the start of the game. 
+		// Unlike after the start of the game, these messages are not saved to the database. 
+		function printMessage(from, message){
+			var localMessage = $('<p>').html("<strong>" + from + ": </strong>" + message);
+			localMessage.attr('class', 'message');
+			$('#message-console').append(localMessage);
+		};
+
+		function startGame(){
+
+		};
+
 		// Click functionality goes here
 		$( document ).ready(function() {
 			$("#set-name-button").on("click", function() {
@@ -103,9 +116,6 @@
 				initChallenge(enemyTarget);
 			});
 
-			$("body").on("click", "button.accept-button", function(){
-				console.log(this.value);
-			});
 		});
 
 		Object.size = function(obj) {
@@ -151,7 +161,6 @@
 				    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
 				    	database.ref('activeUChallenges/' + key).remove();
 				    } else if (localTarget === currentUser && localStatus === "is_open"){
-				    	console.log("Player being challenged")
 				    	// Current user is being challenged! 
 				    	var challengeMessage = $('<p>').attr("class", "message game-message");
 				    	challengeMessage.text("You've been challenged by " + localChallenger + "!");
@@ -159,19 +168,51 @@
 				    	acceptButton.attr('value', localChallenger);
 				    	acceptButton.text("Accept");
 				    	var declineButton = $('<button>').attr('class', 'chat-button decline-button');
-				    	console.log(localChallenger)
 				    	declineButton.attr('value', localChallenger);
 				    	declineButton.text("Decline");
 				    	challengeMessage.append(acceptButton);
 				    	challengeMessage.append(declineButton);
 				    	$('#message-console').append(challengeMessage);
 
+				    	// This is what happens when a player accepts a challenge.
+						$("body").on("click", "button.accept-button", function(){
+							gameChallenger = this.value;
+
+							// The database is updated
+							firebase.database().ref('activeUChallenges/' + key).update({
+								ChallengeStatus: "accepted"
+							});
+
+							startGame();
+						});
+
+						// This is what happens when a player declines a challenge.
+						$("body").on("click", "button.decline-button", function(){
+							// The database is updated
+							firebase.database().ref('activeUChallenges/' + key).update({
+								ChallengeStatus: "declined"
+							});
+							printMessage("Game", "You have declined the challenge.");
+						});
+
 				    	// This updates the status of the challenge so it is not re-posted.
 						firebase.database().ref('activeUChallenges/' + key).update({
 							ChallengeStatus: "recieved"
 						});
 				    } else if (localChallenger === currentUser){
-				//    	console.log(key.ChallengeStatus);
+						if (localStatus === "accepted"){
+							printMessage("Game", localTarget + " has accepted your challenge!");
+							gameChallenger = localTarget;
+							setTimeout(function() { 
+								startGame();
+							}, 2000);
+						} else if (localStatus === "declined"){
+							printMessage("Game", localTarget + " has declined your challenge.");
+
+							firebase.database().ref('activeUChallenges/' + key).update({
+								ChallengeStatus: "ended"
+							});
+						};  	
 				    };
 			    };
 			};
