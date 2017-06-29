@@ -44,6 +44,7 @@
 		    name: newUser
 		  });
 		  currentUser = newUser;
+		  console.log(currentUser + " set")
 		  activeUserPath = firebase.database().ref('activeUsers/' + currentUser)
 		  activeUserPath.onDisconnect().remove();
 		};
@@ -54,6 +55,7 @@
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
 			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
 			activeUsersDisplay.append(challengeInstructions);
+			// ATTN: This needs to be fixed. 
 			if (activeUserList.length === 0){
 				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
 				activeUsersDisplay.append(noChallengersWarning);
@@ -142,15 +144,20 @@
 			    if (activeChallengesObj.hasOwnProperty(key)) {
 				    var localChallenger = key.split("-")[0];
 				    var localTarget = key.split("-")[1];
-				    var localPath = activeChallengesObj[localChallenger + "-" + localTarget + "-open"];
+				    var localPath = activeChallengesObj[localChallenger + "-" + localTarget];
 				    var localStatus = localPath.ChallengeStatus;
+
+				    console.log(localTarget);
+				    console.log(currentUser);
+				    console.log(localStatus);
 
 				    // This removes open challengs if one or both of the users has left the site.
 				    // Next the function checks to see if the current user is being challenged. 
 				    // The next part checks for responses to open challenges from current user.
 				    if (activeUserList.indexOf(localChallenger) < 0 || activeUserList.indexOf(localTarget) < 0){
 				    	database.ref('activeUChallenges/' + key).remove();
-				    } else if (localTarget === currentUser && localStatus === "open"){
+				    } else if (localTarget === currentUser && localStatus === "is_open"){
+				    	console.log("Player being challenged")
 				    	// Current user is being challenged! 
 				    	var challengeMessage = $('<p>').attr("class", "message game-message");
 				    	challengeMessage.text("You've been challenged by " + localChallenger + "!");
