@@ -71,7 +71,7 @@
 		};
 
 		function initChallenge(target){
-			firebase.database().ref('activeUChallenges/' + currentUser + '-' + target + "-open").set({
+			firebase.database().ref('activeUChallenges/' + currentUser + '-' + target).set({
 				challenger: currentUser,
 				target: target,
 				ChallengeStatus: "is_open"
@@ -142,8 +142,8 @@
 			    if (activeChallengesObj.hasOwnProperty(key)) {
 				    var localChallenger = key.split("-")[0];
 				    var localTarget = key.split("-")[1];
-				    var localStatus = key.split("-")[2];
 				    var localPath = activeChallengesObj[localChallenger + "-" + localTarget + "-open"];
+				    var localStatus = localPath.ChallengeStatus;
 
 				    // This removes open challengs if one or both of the users has left the site.
 				    // Next the function checks to see if the current user is being challenged. 
