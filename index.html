@@ -90,9 +90,46 @@
 		};
 
 		function startGame(){
-			console.log("Game function running")
-			$('#main-stage').empty()
-			$('#message-console').empty();
+			// Clears out the previous parts of the game.
+			$('#main-stage').remove();
+			$('#message-console').remove();
+
+			// This removes the player from the list of players looking for competitors. 
+			activeUserPath.remove();
+
+			// This generates elements for the new game play.
+			// A player should always see their own thumbnail in the left side of the screen since that is more comfortable for most westerners. 
+			// Player display
+			var playerDisplay = $('<div>').attr('id', 'player-display');
+			var playerTitle = $('<h2>').text(currentUser);
+			playerTitle.attr('class', 'play-title');
+			var playerStatusDisplay = $('<div>').attr('id', 'player-status-display');
+			var playerWinsDisplay = $('<p>').html("Total wins: <span id='player-wins-display'>0</span>");
+			playerDisplay.append(playerTitle);
+			playerDisplay.append(playerStatusDisplay);
+			playerDisplay.append(playerWinsDisplay);
+
+			// Generates rounds lett message
+			var roundsLeftDisplay = $('h3').attr('id', 'rounds-left-display');
+			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display'>10</span>");
+
+			// Challenger display
+			var challengerDisplay = $('<div>').attr('id', 'challenger-display');
+			var challengerTitle = $('<h2>').text(gameChallenger);
+			challengerTitle.attr('class', 'play-title');
+			var challengerStatusDisplay = $('<div>').attr('id', 'challenger-status-display');
+			var challengerWinsDisplay = $('<p>').html("Total wins: <span id='challenger-wins-display'>0</span>");
+			challengerDisplay.append(challengerTitle);
+			challengerDisplay.append(challengerStatusDisplay);
+			challengerDisplay.append(challengerWinsDisplay);
+
+			var gameChatWindow = $('div').attr('id', 'game-chat-window');
+
+			// Adds it all to the page
+			$('body').append(playerDisplay);
+			$('body').append(roundsLeftDisplay);
+			$('body').append(challengerDisplay);
+			$('body').append(gameChatWindow);
 		};
 
 		// Click functionality goes here
