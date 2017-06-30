@@ -89,6 +89,14 @@
 			$('#message-console').append(localMessage);
 		};
 
+		function gamePlay(){
+			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
+				var gameObj = snapshot.val();
+			}, function(error){
+				console.log(error);
+			});
+		};
+
 		function startGame(){
 			// Clears out the previous parts of the game.
 			$('#main-stage').remove();
@@ -130,6 +138,9 @@
 			$('body').append(roundsLeftDisplay);
 			$('body').append(challengerDisplay);
 			$('body').append(gameChatWindow);
+
+			// The function for actual game play is then called. 
+			gamePlay();
 		};
 
 		// Click functionality goes here
@@ -233,7 +244,8 @@
 								playerOneMove: "waiting",
 								playerTwoMove: "waiting",
 								playerOnePoints: 0,
-								playerTwoPoints: 0
+								playerTwoPoints: 0,
+								roundsRemaining: 10
 							});
 
 							startGame();
