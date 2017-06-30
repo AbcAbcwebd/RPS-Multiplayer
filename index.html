@@ -106,37 +106,34 @@
 			activeUserPath.remove();
 
 			// This generates elements for the new game play.
-			// A player should always see their own thumbnail in the left side of the screen since that is more comfortable for most westerners. 
 			// Player display
-			var playerDisplay = $('<div>').attr('id', 'player-display');
-			var playerTitle = $('<h2>').text(currentUser);
-			playerTitle.attr('class', 'play-title');
-			var playerStatusDisplay = $('<div>').attr('id', 'player-status-display');
-			var playerWinsDisplay = $('<p>').html("Total wins: <span id='player-wins-display'>0</span>");
-			playerDisplay.append(playerTitle);
-			playerDisplay.append(playerStatusDisplay);
-			playerDisplay.append(playerWinsDisplay);
+			var player1Display = $('<div>').attr('id', 'player1-display');
+			var player1Title = $('<h2>').attr('class', 'play1-title');
+			var player1StatusDisplay = $('<div>').attr('id', 'player1-status-display');
+			var player1WinsDisplay = $('<p>').html("Total wins: <span id='player1-wins-display'>0</span>");
+			player1Display.append(player1Title);
+			player1Display.append(player1StatusDisplay);
+			player1Display.append(player1WinsDisplay);
 
 			// Generates rounds lett message
 			var roundsLeftDisplay = $('h3').attr('id', 'rounds-left-display');
 			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display'>10</span>");
 
-			// Challenger display
-			var challengerDisplay = $('<div>').attr('id', 'challenger-display');
-			var challengerTitle = $('<h2>').text(gameChallenger);
-			challengerTitle.attr('class', 'play-title');
-			var challengerStatusDisplay = $('<div>').attr('id', 'challenger-status-display');
-			var challengerWinsDisplay = $('<p>').html("Total wins: <span id='challenger-wins-display'>0</span>");
-			challengerDisplay.append(challengerTitle);
-			challengerDisplay.append(challengerStatusDisplay);
-			challengerDisplay.append(challengerWinsDisplay);
+			// Player display
+			var player2Display = $('<div>').attr('id', 'player2-display');
+			var player2Title = $('<h2>').attr('class', 'play2-title');
+			var player2StatusDisplay = $('<div>').attr('id', 'player2-status-display');
+			var player2WinsDisplay = $('<p>').html("Total wins: <span id='player2-wins-display'>0</span>");
+			player2Display.append(playerTitle);
+			player2Display.append(playerStatusDisplay);
+			player2Display.append(playerWinsDisplay);
 
 			var gameChatWindow = $('div').attr('id', 'game-chat-window');
 
 			// Adds it all to the page
-			$('body').append(playerDisplay);
+			$('body').append(player1Display);
 			$('body').append(roundsLeftDisplay);
-			$('body').append(challengerDisplay);
+			$('body').append(player2Display);
 			$('body').append(gameChatWindow);
 
 			// The function for actual game play is then called. 
