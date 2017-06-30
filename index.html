@@ -92,6 +92,11 @@
 		function gamePlay(){
 			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
 				var gameObj = snapshot.val();
+				console.log(gameObj);
+
+				// Adds names to player displays
+				$('#play1-title').text(gameObj.playerOne);
+				$('#play2-title').text(gameObj.playerTwo);
 			}, function(error){
 				console.log(error);
 			});
@@ -108,7 +113,7 @@
 			// This generates elements for the new game play.
 			// Player display
 			var player1Display = $('<div>').attr('id', 'player1-display');
-			var player1Title = $('<h2>').attr('class', 'play1-title');
+			var player1Title = $('<h2>').attr('id', 'play1-title');
 			var player1StatusDisplay = $('<div>').attr('id', 'player1-status-display');
 			var player1WinsDisplay = $('<p>').html("Total wins: <span id='player1-wins-display'>0</span>");
 			player1Display.append(player1Title);
@@ -121,12 +126,12 @@
 
 			// Player display
 			var player2Display = $('<div>').attr('id', 'player2-display');
-			var player2Title = $('<h2>').attr('class', 'play2-title');
+			var player2Title = $('<h2>').attr('id', 'play2-title');
 			var player2StatusDisplay = $('<div>').attr('id', 'player2-status-display');
 			var player2WinsDisplay = $('<p>').html("Total wins: <span id='player2-wins-display'>0</span>");
-			player2Display.append(playerTitle);
-			player2Display.append(playerStatusDisplay);
-			player2Display.append(playerWinsDisplay);
+			player2Display.append(player2Title);
+			player2Display.append(player2StatusDisplay);
+			player2Display.append(player2WinsDisplay);
 
 			var gameChatWindow = $('div').attr('id', 'game-chat-window');
 
