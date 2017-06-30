@@ -89,6 +89,11 @@
 			$('#message-console').append(localMessage);
 		};
 
+		function comparePlay(){
+
+		};
+
+		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
 			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
 				var gameObj = snapshot.val();
@@ -102,13 +107,42 @@
 				// Checks to see if current user is player 1 or 2.
 				if (currentUser === gameObj.playerOne){
 					localPlayer = "One";
-					console.log("Assigned player #1")
 				} else if (currentUser === gameObj.playerTwo){
 					localPlayer = "Two";
-					console.log("Assigned player #2")
-				} else {
-					console.log("Player numbers not assigned.")
-				}
+				};
+
+				// Defines the gameplay HTML elements
+				var itemChoices = $('<div>');
+				var rock = $('<p>').text("Rock").attr('class', 'game-choice').attr('type', 'Rock');
+				var paper = $('<p>').text("Paper").attr('class', 'game-choice').attr('type', 'Paper');
+				var scissors = $('<p>').text("Scissors").attr('class', 'game-choice').attr('type', 'Scissors');
+				itemChoices.append(rock, paper, scissors);
+
+				var otherPlayerWaiting = $('<p>').text("?").attr('class', 'wait-mark');
+
+				
+
+				// Keeps track of whose turn it is and monitors game status.
+				if (localPlayer === "One" && gameObj.playerOneMove === "waiting"){
+					// Player one should be given play choices.
+					$('#player1-status-display').html(itemChoices);
+					$('#player2-status-display').html(otherPlayerWaiting);
+				} else if (localPlayer === "Two" && gameObj.playerTwoMove === "waiting"){
+					// Player two should be given play choices. 
+					$('#player2-status-display').html(itemChoices);
+					$('#player1-status-display').html(otherPlayerWaiting);
+				} else if (localPlayer === "One" && gameObj.playerOneMove === "played" && gameObj.playerTwoMove === "waiting") {
+					// Waiting on player two.
+					$('#player1-status-display').html("<p>Waiting on" + gameObj.playerTwo + "</p>");
+					$('#player2-status-display').html(otherPlayerWaiting);
+				} else if (localPlayer === "Two" && gameObj.playerTwoMove === "played" && gameObj.playerOneMove === "waiting"){
+					// Waiting on player one.
+					$('#player2-status-display').html("<p>Waiting on" + gameObj.playerOne + "</p>");
+					$('#player1-status-display').html(otherPlayerWaiting);
+				} else if (gameObj.playerOneMove === "played" && gameObj.playerTwoMove === "played"){
+					// Both players have played.
+					var roundResult = comparePlay();
+				};
 			}, function(error){
 				console.log(error);
 			});
@@ -179,6 +213,11 @@
 			$("body").on("click", "p.player-list-item", function(){
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
+			});
+
+			// Click event for gameplay buttons
+			$("body").on("click", "p.game-choice", function(){
+				console.log($(this).attr('type'));
 			});
 
 		});
