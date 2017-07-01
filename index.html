@@ -37,6 +37,11 @@
 		var activeUserList = [];
 		var gameChallenger;
 		var gamePath;
+		var localPlayer;
+
+		// These variables are used for per round game logic
+		var userOneMove;
+		var userTwoMove;
 
 		// This keeps track of whether or not we're currently displaying the active user list. 
 		var displayUserList = false;
@@ -89,15 +94,24 @@
 			$('#message-console').append(localMessage);
 		};
 
+		// This function detemines who won any particular round
 		function comparePlay(){
-
+			if ((userOneMove === "Rock" && userTwoMove === "Scissors") || (userOneMove === "Paper" && userTwoMove === "Rock") || (userOneMove === "Scissors" && userTwoMove === "Paper")){
+				// User one wins
+				return "One wins"
+			} else if ((userOneMove === "Rock" && userTwoMove === "Paper") || (userOneMove === "Paper" && userTwoMove === "Scissors") || (userOneMove === "Scissors" && userTwoMove === "Rock")){
+				// User two wins
+				return "Two wins"
+			} else {
+				// It's a tie
+				return "Tie"
+			};
 		};
 
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
 			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
 				var gameObj = snapshot.val();
-				var localPlayer;
 				console.log(gameObj);
 
 				// Adds names to player displays
@@ -131,17 +145,65 @@
 					// Player two should be given play choices. 
 					$('#player2-status-display').html(itemChoices);
 					$('#player1-status-display').html(otherPlayerWaiting);
-				} else if (localPlayer === "One" && gameObj.playerOneMove === "played" && gameObj.playerTwoMove === "waiting") {
+				} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
 					// Waiting on player two.
 					$('#player1-status-display').html("<p>Waiting on" + gameObj.playerTwo + "</p>");
 					$('#player2-status-display').html(otherPlayerWaiting);
-				} else if (localPlayer === "Two" && gameObj.playerTwoMove === "played" && gameObj.playerOneMove === "waiting"){
+				} else if (localPlayer === "Two" && gameObj.playerTwoMove != "waiting" && gameObj.playerOneMove === "waiting"){
 					// Waiting on player one.
 					$('#player2-status-display').html("<p>Waiting on" + gameObj.playerOne + "</p>");
 					$('#player1-status-display').html(otherPlayerWaiting);
-				} else if (gameObj.playerOneMove === "played" && gameObj.playerTwoMove === "played"){
+				// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
+				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
 					// Both players have played.
+					userOneMove = gameObj.playerOneMove;
+					userTwoMove = gameObj.playerTwoMove;
 					var roundResult = comparePlay();
+
+					if (roundResult === "One wins"){
+						$('win-status').text("Player One Wins!");
+						gameObj.roundWinner = "One";
+						gameObj.playerOnePoints++;
+
+					} else if (roundResult === "Two wins"){
+						$('win-status').text("Player Two Wins!");
+						gameObj.roundWinner = "Two";
+						gameObj.playerTwoPoints++;
+
+					} else if (roundResult === "Tie"){
+						$('win-status').text("This rounds a tie.");
+						gameObj.roundWinner = "Tie";
+
+					};
+				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
+					// Player two then recieves the results of the round
+					if (roundResult === "One wins"){
+						$('win-status').text("Player One Wins!");
+					} else if (roundResult === "Two wins"){
+						$('win-status').text("Player Two Wins!");
+					} else if (roundResult === "Tie"){
+						$('win-status').text("This rounds a tie.");
+					};
+
+					// Game waits 2 seconds to allow players to see results of the round
+					// Database counters are then updated in preperation for the next round
+					setTimeout(function() { 
+						gameObj.playerOneMove = "waiting";
+						gameObj.playerTwoMove = "waiting";
+						gameObj.roundWinner = "none";
+						gameObj.roundsRemaining--;
+						$('#win-status').text("");
+					}, 2000);
+				};
+
+				// This displays
+				$('#rounds-left-display').text(gameObj.roundsRemaining);
+				$('#player1-wins-display').text(gameObj.playerOnePoints);
+				$('#player2-wins-display').text(gameObj.playerTwoPoints);
+
+				// This checks it see if the game is over. It is a seperate if statement because the game might have just ended.
+				if (gameObj.roundsRemaining <= 0){
+					
 				};
 			}, function(error){
 				console.log(error);
@@ -168,7 +230,7 @@
 
 			// Generates rounds lett message
 			var roundsLeftDisplay = $('h3').attr('id', 'rounds-left-display');
-			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display'>10</span>");
+			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display'>10</span><br><span id='win-status'></span>");
 
 			// Player display
 			var player2Display = $('<div>').attr('id', 'player2-display');
@@ -305,6 +367,7 @@
 								playerTwo: gameChallenger,
 								playerOneMove: "waiting",
 								playerTwoMove: "waiting",
+								roundWinner: "none",
 								playerOnePoints: 0,
 								playerTwoPoints: 0,
 								roundsRemaining: 10
