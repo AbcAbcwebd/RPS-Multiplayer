@@ -103,6 +103,12 @@
 		// This function detemines who won any particular round
 		function comparePlay(){
 			console.log("Comparing play")
+
+			// For reference
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObjT = snapshot.val();
+				console.log(gameObjT);});
+
 			if ((userOneMove === "Rock" && userTwoMove === "Scissors") || (userOneMove === "Paper" && userTwoMove === "Rock") || (userOneMove === "Scissors" && userTwoMove === "Paper")){
 				// User one wins
 				return "One wins";
@@ -118,13 +124,23 @@
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
 			console.log("Game play running")
+			/*
 			database.ref('activeGames').on("value", function(snapshot){
 				gameObj = snapshot.val();
 				console.log(gameObj);});
-			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
-				gameObj = snapshot.val();
+			*/
+			// Actual
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
 				console.log(gameObj);
+
+			/*
+			// For reference
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObjT = snapshot.val();
+				console.log(gameObjT);});
+			*/
 
 				// Adds names to player displays
 				$('#play1-title').text(gameObj.playerOne);
@@ -158,6 +174,11 @@
 					}; 
 				};
 */
+
+				// For reference
+				database.ref('activeGames').on("value", function(snapshot){
+					gameObjT = snapshot.val();
+					console.log(gameObjT);});
 				
 				console.log("Starting game logic")
 				// Keeps track of whose turn it is and monitors game status.
@@ -173,13 +194,20 @@
 					$('#player1-status-display').html(otherPlayerWaiting);
 				} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
 					console.log("Third running")
+
+					// For reference
+					database.ref('activeGames').on("value", function(snapshot){
+						gameObjT = snapshot.val();
+						console.log(gameObjT);});
+
+
 					// Waiting on player two.
-					$('#player1-status-display').html("<p>Waiting on" + gameObj.playerTwo + "</p>");
+					$('#player1-status-display').html("<p>Waiting on " + gameObj.playerTwo + "</p>");
 					$('#player2-status-display').html(otherPlayerWaiting);
 				} else if (localPlayer === "Two" && gameObj.playerTwoMove != "waiting" && gameObj.playerOneMove === "waiting"){
 					console.log("Fourth runnning")
 					// Waiting on player one.
-					$('#player2-status-display').html("<p>Waiting on" + gameObj.playerOne + "</p>");
+					$('#player2-status-display').html("<p>Waiting on " + gameObj.playerOne + "</p>");
 					$('#player1-status-display').html(otherPlayerWaiting);
 				// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
 				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
@@ -187,7 +215,18 @@
 					// Both players have played.
 					userOneMove = gameObj.playerOneMove;
 					userTwoMove = gameObj.playerTwoMove;
+
+					// For reference
+					database.ref('activeGames').on("value", function(snapshot){
+						gameObjT = snapshot.val();
+						console.log(gameObjT);});
+
 					var roundResult = comparePlay();
+
+					// For reference
+					database.ref('activeGames').on("value", function(snapshot){
+						gameObjT = snapshot.val();
+						console.log(gameObjT);});
 
 					if (roundResult === "One wins"){
 						console.log("One wins")
@@ -227,6 +266,11 @@
 					}, 2000);
 				};
 
+				// For reference
+				database.ref('activeGames').on("value", function(snapshot){
+					gameObjT = snapshot.val();
+					console.log(gameObjT);});
+
 				// This displays
 				$('#rounds-left-display').text(gameObj.roundsRemaining);
 				$('#player1-wins-display').text(gameObj.playerOnePoints);
@@ -237,6 +281,11 @@
 					
 				};
 				console.log("Full run gameplay detect function")
+
+				// For reference
+				database.ref('activeGames').on("value", function(snapshot){
+					gameObjT = snapshot.val();
+					console.log(gameObjT);});
 			}, function(error){
 				console.log(error);
 			});
@@ -248,11 +297,12 @@
 				gameObj = snapshot.val();
 				console.log(gameObj);});
 			// Clears out the previous parts of the game.
+			displayUserList = false;
 			$('#main-stage').remove();
 			$('#message-console').remove();
 
 			// This removes the player from the list of players looking for competitors. 
-			activeUserPath.remove();
+//			activeUserPath.remove();
 
 			database.ref('activeGames').on("value", function(snapshot){
 				gameObj = snapshot.val();
@@ -357,6 +407,12 @@
 		// This interacts with the database and maintains a list of active users.
 		database.ref('activeUsers/').on("value", function(snapshot){
 			console.log("Active users database has updated")
+
+			// For reference
+				database.ref('activeGames').on("value", function(snapshot){
+					gameObjT = snapshot.val();
+					console.log(gameObjT);});
+
 			var activeUsersObj = snapshot.val();
 			currentUserCount = Object.size(activeUsersObj);
 			activeUserList = [];
