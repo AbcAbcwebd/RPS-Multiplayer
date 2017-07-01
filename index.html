@@ -38,6 +38,8 @@
 		var gameChallenger;
 		var gamePath;
 		var localPlayer;
+		var localMove = "none";
+		var gameObj;
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -111,7 +113,7 @@
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
 			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
-				var gameObj = snapshot.val();
+				gameObj = snapshot.val();
 				console.log(gameObj);
 
 				// Adds names to player displays
@@ -134,38 +136,57 @@
 
 				var otherPlayerWaiting = $('<p>').text("?").attr('class', 'wait-mark');
 
+/*
+				if (localMove != "none"){
+					console.log("Move detected");
+					if (localPlayer === "One"){
+							gameObj.playerOneMove = localMove;
+							localMove = "none";
+					} else if (localPlayer === "Two"){
+							gameObj.playerTwoMove = localMove;
+							localMove = "none";
+					}; 
+				};
+*/
 				
-
+				console.log("Starting game logic")
 				// Keeps track of whose turn it is and monitors game status.
 				if (localPlayer === "One" && gameObj.playerOneMove === "waiting"){
+					console.log("First running")
 					// Player one should be given play choices.
 					$('#player1-status-display').html(itemChoices);
 					$('#player2-status-display').html(otherPlayerWaiting);
 				} else if (localPlayer === "Two" && gameObj.playerTwoMove === "waiting"){
+					console.log("Second running")
 					// Player two should be given play choices. 
 					$('#player2-status-display').html(itemChoices);
 					$('#player1-status-display').html(otherPlayerWaiting);
 				} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
+					console.log("Third running")
 					// Waiting on player two.
 					$('#player1-status-display').html("<p>Waiting on" + gameObj.playerTwo + "</p>");
 					$('#player2-status-display').html(otherPlayerWaiting);
 				} else if (localPlayer === "Two" && gameObj.playerTwoMove != "waiting" && gameObj.playerOneMove === "waiting"){
+					console.log("Fourth runnning")
 					// Waiting on player one.
 					$('#player2-status-display').html("<p>Waiting on" + gameObj.playerOne + "</p>");
 					$('#player1-status-display').html(otherPlayerWaiting);
 				// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
 				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
+					console.log("Fifth")
 					// Both players have played.
 					userOneMove = gameObj.playerOneMove;
 					userTwoMove = gameObj.playerTwoMove;
 					var roundResult = comparePlay();
 
 					if (roundResult === "One wins"){
+						console.log("One wins")
 						$('win-status').text("Player One Wins!");
 						gameObj.roundWinner = "One";
 						gameObj.playerOnePoints++;
 
 					} else if (roundResult === "Two wins"){
+						console.log("Two wins")
 						$('win-status').text("Player Two Wins!");
 						gameObj.roundWinner = "Two";
 						gameObj.playerTwoPoints++;
@@ -205,6 +226,7 @@
 				if (gameObj.roundsRemaining <= 0){
 					
 				};
+				console.log("Full run gameplay detect function")
 			}, function(error){
 				console.log(error);
 			});
@@ -250,6 +272,7 @@
 			$('body').append(gameChatWindow);
 
 			// The function for actual game play is then called. 
+			console.log("About to start game play")
 			gamePlay();
 		};
 
@@ -269,26 +292,31 @@
 					generateActiveUsersList();
 					displayUserList = true;
 				};
+
+				// Click event for gameplay buttons
+				$("body").on("click", "p.game-choice", function(){
+					localMove = $(this).attr('type');
+					// User selection is saved to a global variable which is then detected by the program else where in the code.
+
+					console.log("Move detected");
+					if (localPlayer === "One"){
+							gameObj.playerOneMove = localMove;
+							localMove = "none";
+					} else if (localPlayer === "Two"){
+							gameObj.playerTwoMove = localMove;
+							localMove = "none";
+					}; 
+
+					firebase.database().ref('activeGames/' + gamePath).update({
+						playerOneMove: "accepted"
+					});
+				});
 				
 			});
 
 			$("body").on("click", "p.player-list-item", function(){
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
-			});
-
-			// Click event for gameplay buttons
-			$("body").on("click", "p.game-choice", function(){
-				localMove = $(this).attr('type');
-				if (localPlayer === "One"){
-					firebase.database().ref('activeGames/' + gamePath).update({
-						playerOneMove: localMove
-					});
-				} else if (localPlayer === "Two"){
-					firebase.database().ref('activeGames/' + gamePath).update({
-						playerTwoMove: localMove
-					});
-				};
 			});
 
 		});
@@ -415,6 +443,11 @@
 		});
 
 		// This goes through and deletes challenges that are not being actively used. IE-- If one or both players are now offiline. 
+		// EDIT: This causes problems since it is based on whether or not users are currently active but users are removed from the active list when they enter game play causing the game obj to be deleted. 
+		// A work around is possible by maintaining a seperate list of users actively playing games and using detecting when they disconnect. 
+		// In the short term, however, I have decided to leave game objs in the database so that I can see who's playing and how the game is going. 
+		// This could also eventually be used to develop some sort of high score list based on wins in a row. 
+		/*
 		database.ref('activeGames/').on("value", function(snapshot){
 			var activeGamesObj = snapshot.val();
 			for (var key in activeGamesObj) {
@@ -427,6 +460,7 @@
 		}, function(error){
 			console.log(error);
 		});
+		*/
 
 	</script>
 </body>
