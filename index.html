@@ -40,6 +40,7 @@
 		var localPlayer;
 		var localMove = "none";
 		var gameObj;
+		var inGamePlay = [];
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -131,6 +132,15 @@
 			*/
 			// Actual
 			database.ref('activeGames').on("value", function(snapshot){
+
+				// This maintains an array of users actively invovled in gameplay.
+				inGamePlay = [];
+				for (var key in snapshot.val()) {
+				  if (snapshot.val().hasOwnProperty(key)) {
+				    inGamePlay.push(key);
+				  };
+				};
+
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
 				console.log(gameObj);
@@ -303,10 +313,11 @@
 
 			// This removes the player from the list of players looking for competitors. 
 //			activeUserPath.remove();
-
+/*
 			database.ref('activeGames').on("value", function(snapshot){
 				gameObj = snapshot.val();
 				console.log(gameObj);});
+*/
 
 			// This generates elements for the new game play.
 			// Player display
@@ -407,18 +418,21 @@
 		// This interacts with the database and maintains a list of active users.
 		database.ref('activeUsers/').on("value", function(snapshot){
 			console.log("Active users database has updated")
-
+/*
 			// For reference
 				database.ref('activeGames').on("value", function(snapshot){
 					gameObjT = snapshot.val();
 					console.log(gameObjT);});
-
+*/
 			var activeUsersObj = snapshot.val();
 			currentUserCount = Object.size(activeUsersObj);
 			activeUserList = [];
 			for (var key in activeUsersObj) {
 			  if (activeUsersObj.hasOwnProperty(key)) {
-			    activeUserList.push(key);
+			  	// This inner if statement ensures the program doesn't display users who are already actively involved in a challenge. 
+			    if (inGamePlay.indexOf(key) < 0){
+			    	activeUserList.push(key);
+			    };
 			  }
 			}
 
