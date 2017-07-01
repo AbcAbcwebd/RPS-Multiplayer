@@ -40,7 +40,7 @@
 		var localPlayer;
 		var localMove = "none";
 		var gameObj;
-		var inGamePlay = [];
+//		var inGamePlay = [];
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -134,16 +134,28 @@
 			database.ref('activeGames').on("value", function(snapshot){
 
 				// This maintains an array of users actively invovled in gameplay.
+				/*
 				inGamePlay = [];
 				for (var key in snapshot.val()) {
 				  if (snapshot.val().hasOwnProperty(key)) {
 				    inGamePlay.push(key);
 				  };
 				};
+				*/
+				// This seems to be causing problems
+				/*
+				var allGamesObj = snapshot.val();
+				inGamePlay = [];
+				for (var key in allGamesObj) {
+				  if (allGamesObj.hasOwnProperty(key)) {
+				    	console.log(key);
+				  }
+				}
 
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
 				console.log(gameObj);
+				*/
 
 			/*
 			// For reference
@@ -430,9 +442,9 @@
 			for (var key in activeUsersObj) {
 			  if (activeUsersObj.hasOwnProperty(key)) {
 			  	// This inner if statement ensures the program doesn't display users who are already actively involved in a challenge. 
-			    if (inGamePlay.indexOf(key) < 0){
+	//		    if (inGamePlay.indexOf(key) < 0){
 			    	activeUserList.push(key);
-			    };
+	//		    };
 			  }
 			}
 
