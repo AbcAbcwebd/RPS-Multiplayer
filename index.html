@@ -49,6 +49,7 @@
 		var displayUserList = false;
 
 		function addActiveUserData(newUser) {
+			console.log("Adding active user")
 		  firebase.database().ref('activeUsers/' + newUser).set({
 		    name: newUser
 		  });
@@ -59,6 +60,7 @@
 
 		// This sets things up for the user to pick a challenger
 		function generateActiveUsersList(){
+			console.log("Generating active user list")
 			$('#active-user-display').remove();
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
 			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
@@ -81,6 +83,7 @@
 		};
 
 		function initChallenge(target){
+			console.log("Challenge initiated")
 			firebase.database().ref('activeUChallenges/' + currentUser + '-' + target).set({
 				challenger: currentUser,
 				target: target,
@@ -91,6 +94,7 @@
 		// This is for displaying messages to the messaging console prior to the start of the game. 
 		// Unlike after the start of the game, these messages are not saved to the database. 
 		function printMessage(from, message){
+			console.log("Printing message")
 			var localMessage = $('<p>').html("<strong>" + from + ": </strong>" + message);
 			localMessage.attr('class', 'message');
 			$('#message-console').append(localMessage);
@@ -98,22 +102,28 @@
 
 		// This function detemines who won any particular round
 		function comparePlay(){
+			console.log("Comparing play")
 			if ((userOneMove === "Rock" && userTwoMove === "Scissors") || (userOneMove === "Paper" && userTwoMove === "Rock") || (userOneMove === "Scissors" && userTwoMove === "Paper")){
 				// User one wins
-				return "One wins"
+				return "One wins";
 			} else if ((userOneMove === "Rock" && userTwoMove === "Paper") || (userOneMove === "Paper" && userTwoMove === "Scissors") || (userOneMove === "Scissors" && userTwoMove === "Rock")){
 				// User two wins
-				return "Two wins"
+				return "Two wins";
 			} else {
 				// It's a tie
-				return "Tie"
+				return "Tie";
 			};
 		};
 
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
+			console.log("Game play running")
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val();
+				console.log(gameObj);});
 			database.ref('activeGames/' + gamePath).on("value", function(snapshot){
 				gameObj = snapshot.val();
+				console.log(snapshot);
 				console.log(gameObj);
 
 				// Adds names to player displays
@@ -233,12 +243,20 @@
 		};
 
 		function startGame(){
+			console.log("Starting game")
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val();
+				console.log(gameObj);});
 			// Clears out the previous parts of the game.
 			$('#main-stage').remove();
 			$('#message-console').remove();
 
 			// This removes the player from the list of players looking for competitors. 
 			activeUserPath.remove();
+
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val();
+				console.log(gameObj);});
 
 			// This generates elements for the new game play.
 			// Player display
@@ -273,12 +291,16 @@
 
 			// The function for actual game play is then called. 
 			console.log("About to start game play")
+			database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val();
+				console.log(gameObj);});
 			gamePlay();
 		};
 
 		// Click functionality goes here
 		$( document ).ready(function() {
 			$("#set-name-button").on("click", function() {
+				console.log("Set name button clicked")
 				event.preventDefault();
 				var userInput = $('#name-input').val();
 				// Validates user input to make sure it's not blank and not a duplicate username.
@@ -295,6 +317,7 @@
 
 				// Click event for gameplay buttons
 				$("body").on("click", "p.game-choice", function(){
+					console.log("Game choice clicked")
 					localMove = $(this).attr('type');
 					// User selection is saved to a global variable which is then detected by the program else where in the code.
 
@@ -315,6 +338,7 @@
 			});
 
 			$("body").on("click", "p.player-list-item", function(){
+				console.log("Player list item clicked")
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
 			});
@@ -322,6 +346,7 @@
 		});
 
 		Object.size = function(obj) {
+			console.log("Checking object size")
 		    var size = 0, key;
 		    for (key in obj) {
 		        if (obj.hasOwnProperty(key)) size++;
@@ -331,6 +356,7 @@
 
 		// This interacts with the database and maintains a list of active users.
 		database.ref('activeUsers/').on("value", function(snapshot){
+			console.log("Active users database has updated")
 			var activeUsersObj = snapshot.val();
 			currentUserCount = Object.size(activeUsersObj);
 			activeUserList = [];
@@ -346,10 +372,12 @@
 			}
 		}, function(error){
 			console.log(error);
+			console.log("Error run")
 		});
 
 		// This keeps tabs on open challenges
 		database.ref('activeUChallenges/').on("value", function(snapshot){
+			console.log("Active U Challenges database has updated")
 			var activeChallengesObj = snapshot.val();
 			for (var key in activeChallengesObj) {
 			    if (activeChallengesObj.hasOwnProperty(key)) {
@@ -390,6 +418,7 @@
 							gamePath = currentUser + "-" + gameChallenger;
 
 							// This sets up the object that will manage game play info.
+							console.log("About to set new game node")
 							firebase.database().ref('activeGames/' + gamePath).set({
 								playerOne: currentUser,
 								playerTwo: gameChallenger,
@@ -440,6 +469,7 @@
 			};
 		}, function(error){
 			console.log(error);
+			console.log("Error run")
 		});
 
 		// This goes through and deletes challenges that are not being actively used. IE-- If one or both players are now offiline. 
@@ -460,6 +490,12 @@
 		}, function(error){
 			console.log(error);
 		});
+		*/
+
+		/* To check OBJ contents: 
+		database.ref('activeGames').on("value", function(snapshot){
+				gameObj = snapshot.val();
+				console.log(gameObj);});
 		*/
 
 	</script>
