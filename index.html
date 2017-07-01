@@ -351,6 +351,20 @@
 			console.log(error);
 		});
 
+		// This goes through and deletes challenges that are not being actively used. IE-- If one or both players are now offiline. 
+		database.ref('activeGames/').on("value", function(snapshot){
+			var activeGamesObj = snapshot.val();
+			for (var key in activeGamesObj) {
+				var localFirst = key.split("-")[0];
+				var localSecond = key.split("-")[1];
+				if (activeUserList.indexOf(localFirst) < 0 || activeUserList.indexOf(localSecond) < 0){
+				    database.ref('activeGames/' + key).remove();
+				};
+			};
+		}, function(error){
+			console.log(error);
+		});
+
 	</script>
 </body>
 </html>
