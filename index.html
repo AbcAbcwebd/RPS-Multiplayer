@@ -217,7 +217,16 @@
 
 			// Click event for gameplay buttons
 			$("body").on("click", "p.game-choice", function(){
-				console.log($(this).attr('type'));
+				localMove = $(this).attr('type');
+				if (localPlayer === "One"){
+					firebase.database().ref('activeGames/' + gamePath).update({
+						playerOneMove: localMove
+					});
+				} else if (localPlayer === "Two"){
+					firebase.database().ref('activeGames/' + gamePath).update({
+						playerTwoMove: localMove
+					});
+				};
 			});
 
 		});
