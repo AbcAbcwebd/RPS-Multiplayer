@@ -180,10 +180,10 @@
 				} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
 					console.log("Third running")
 
-					// For reference
+		/*			// For reference
 					database.ref('activeGames').on("value", function(snapshot){
 						gameObjT = snapshot.val();
-						console.log(gameObjT);});
+						console.log(gameObjT);}); */
 
 
 					// Waiting on player two.
@@ -230,10 +230,6 @@
 
 					};
 
-				/*	firebase.database().ref('activeGames/' + gamePath).update({
-						
-					}); */
-		//			return;
 				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
 					// Player two then recieves the results of the round
 					var roundResult = comparePlay();
@@ -257,18 +253,10 @@
 								roundsRemaining: localRoundsRemaining
 						});
 						$('#win-status').text("");
-		//				return;
 					}, 2000);
 				};
 
-				/*
-				// For reference
-				database.ref('activeGames').on("value", function(snapshot){
-					gameObjT = snapshot.val();
-					console.log(gameObjT);});
-				*/
-
-				// This displays
+				// Updates displays
 				$('#rounds-left-display').text(gameObj.roundsRemaining);
 				$('#player1-wins-display').text(gameObj.playerOnePoints);
 				$('#player2-wins-display').text(gameObj.playerTwoPoints);
@@ -279,10 +267,6 @@
 				};
 				console.log("Full run gameplay detect function")
 
-				// For reference
-			/*	database.ref('activeGames').on("value", function(snapshot){
-					gameObjT = snapshot.val();
-					console.log(gameObjT);}); */
 			}, function(error){
 				console.log(error);
 			}); 
@@ -313,8 +297,8 @@
 			player1Display.append(player1WinsDisplay);
 
 			// Generates rounds lett message
-			var roundsLeftDisplay = $('h3').attr('id', 'rounds-left-display');
-			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display'>10</span><br><span id='win-status'></span>");
+			var roundsLeftDisplay = $('<h3>').attr('id', 'rounds-left-display');
+			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display-span'>10</span><br><span id='win-status'></span>");
 
 			// Player display
 			var player2Display = $('<div>').attr('id', 'player2-display');
@@ -335,9 +319,9 @@
 
 			// The function for actual game play is then called. 
 			console.log("About to start game play")
-			database.ref('activeGames').on("value", function(snapshot){
+	/*		database.ref('activeGames').on("value", function(snapshot){
 				gameObj = snapshot.val();
-				console.log(gameObj);});
+				console.log(gameObj);}); */
 			gamePlay();
 		};
 
