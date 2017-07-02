@@ -163,97 +163,120 @@
 
 				var otherPlayerWaiting = $('<p>').text("?").attr('class', 'wait-mark');
 
+				// This checks it see if the game is over and makes arrangements accordinly. 
+				if (gameObj.roundsRemaining <= 0){
+					$('#rounds-left-display').text("0");
+					if (playerOneLocalPoints > playerTwoLocalPoints){
+						$('#player1-status-display').text(gameObj.playerOne + " wins!");
+						$('#player2-status-display').text(gameObj.playerOne + " wins!");
+					} else if (playerOneLocalPoints < playerTwoLocalPoints){
+						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
+						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
+					} else if (playerOneLocalPoints === playerTwoLocalPoints){
+						$('#player1-status-display').text("Tie! Preparing bonus round...");
+						$('#player2-status-display').text("Tie! Preparing bonus round...");
+						setTimeout(function() { 
+							firebase.database().ref('activeGames/' + gamePath).update({
+									roundsRemaining: 1
+							});
+
+						}, 2000);
+					};	
+				// If the game is not over, functionality continues. 
+				} else {
+
 				
-				console.log("Starting game logic")
-				console.log("localPlayer: " + localPlayer);
-				// Keeps track of whose turn it is and monitors game status.
-				if (localPlayer === "One" && gameObj.playerOneMove === "waiting"){
-					console.log("First running")
-					// Player one should be given play choices.
-					$('#player1-status-display').html(itemChoices);
-					$('#player2-status-display').html(otherPlayerWaiting);
-				} else if (localPlayer === "Two" && gameObj.playerTwoMove === "waiting"){
-					console.log("Second running")
-					// Player two should be given play choices. 
-					$('#player2-status-display').html(itemChoices);
-					$('#player1-status-display').html(otherPlayerWaiting);
-				} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
-					console.log("Third running")
+					console.log("Starting game logic")
+					console.log("localPlayer: " + localPlayer);
+					// Keeps track of whose turn it is and monitors game status.
+					if (localPlayer === "One" && gameObj.playerOneMove === "waiting"){
+						console.log("First running")
+						// Player one should be given play choices.
+						$('#player1-status-display').html(itemChoices);
+						$('#player2-status-display').html(otherPlayerWaiting);
+					} else if (localPlayer === "Two" && gameObj.playerTwoMove === "waiting"){
+						console.log("Second running")
+						// Player two should be given play choices. 
+						$('#player2-status-display').html(itemChoices);
+						$('#player1-status-display').html(otherPlayerWaiting);
+					} else if (localPlayer === "One" && gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove === "waiting") {
+						console.log("Third running")
 
-		/*			// For reference
-					database.ref('activeGames').on("value", function(snapshot){
-						gameObjT = snapshot.val();
-						console.log(gameObjT);}); */
+			/*			// For reference
+						database.ref('activeGames').on("value", function(snapshot){
+							gameObjT = snapshot.val();
+							console.log(gameObjT);}); */
 
 
-					// Waiting on player two.
-					$('#player1-status-display').html("<p>Waiting on " + gameObj.playerTwo + "</p>");
-					$('#player2-status-display').html(otherPlayerWaiting);
-				} else if (localPlayer === "Two" && gameObj.playerTwoMove != "waiting" && gameObj.playerOneMove === "waiting"){
-					console.log("Fourth runnning")
-					// Waiting on player one.
-					$('#player2-status-display').html("<p>Waiting on " + gameObj.playerOne + "</p>");
-					$('#player1-status-display').html(otherPlayerWaiting);
-				// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
-				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
-					console.log("Fifth")
-					// Both players have played.
-					userOneMove = gameObj.playerOneMove;
-					userTwoMove = gameObj.playerTwoMove;
-		
-					var roundResult = comparePlay();
-					
-					// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. 
-					if (roundResult === "One wins"){
-						console.log("One wins")
-						$('win-status').text("Player One Wins!");
-						gameObj.roundWinner = "One";
-						playerOneLocalPoints++;
-						firebase.database().ref('activeGames/' + gamePath).update({
-								playerOneMove: "waiting",
-								playerOnePoints: playerOneLocalPoints
-						});
+						// Waiting on player two.
+						$('#player1-status-display').html("<p>Waiting on " + gameObj.playerTwo + "</p>");
+						$('#player2-status-display').html(otherPlayerWaiting);
+					} else if (localPlayer === "Two" && gameObj.playerTwoMove != "waiting" && gameObj.playerOneMove === "waiting"){
+						console.log("Fourth runnning")
+						// Waiting on player one.
+						$('#player2-status-display').html("<p>Waiting on " + gameObj.playerOne + "</p>");
+						$('#player1-status-display').html(otherPlayerWaiting);
+					// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
+					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
+						console.log("Fifth")
+						// Both players have played.
+						userOneMove = gameObj.playerOneMove;
+						userTwoMove = gameObj.playerTwoMove;
+			
+						var roundResult = comparePlay();
+						
+						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. 
+						if (roundResult === "One wins"){
+							console.log("One wins")
+							$('win-status').text("Player One Wins!");
+							gameObj.roundWinner = "One";
+							playerOneLocalPoints++;
+							firebase.database().ref('activeGames/' + gamePath).update({
+									playerOneMove: "waiting",
+									playerOnePoints: playerOneLocalPoints
+							});
 
-					} else if (roundResult === "Two wins"){
-						console.log("Two wins")
-						$('win-status').text("Player Two Wins!");
-						gameObj.roundWinner = "Two";
-						playerTwoLocalPoints++;
-						firebase.database().ref('activeGames/' + gamePath).update({
-								playerOneMove: "waiting",
-								playerTwoPoints: playerTwoLocalPoints
-						});
+						} else if (roundResult === "Two wins"){
+							console.log("Two wins")
+							$('win-status').text("Player Two Wins!");
+							gameObj.roundWinner = "Two";
+							playerTwoLocalPoints++;
+							firebase.database().ref('activeGames/' + gamePath).update({
+									playerOneMove: "waiting",
+									playerTwoPoints: playerTwoLocalPoints
+							});
 
-					} else if (roundResult === "Tie"){
-						$('win-status').text("This rounds a tie.");
-						gameObj.roundWinner = "Tie";
+						} else if (roundResult === "Tie"){
+							$('win-status').text("This rounds a tie.");
+							gameObj.roundWinner = "Tie";
 
+						};
+
+					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
+						// Player two then recieves the results of the round
+						var roundResult = comparePlay();
+
+						if (roundResult === "One wins"){
+							$('win-status').text("Player One Wins!");
+						} else if (roundResult === "Two wins"){
+							$('win-status').text("Player Two Wins!");
+						} else if (roundResult === "Tie"){
+							$('win-status').text("This rounds a tie.");
+						};
+
+						// Game waits 2 seconds to allow players to see results of the round
+						// Database counters are then updated in preperation for the next round
+						setTimeout(function() { 
+							localRoundsRemaining--;
+							firebase.database().ref('activeGames/' + gamePath).update({
+									playerOneMove: "waiting",
+									playerTwoMove: "waiting",
+									roundWinner: roundResult,
+									roundsRemaining: localRoundsRemaining
+							});
+							$('#win-status').text("");
+						}, 2000);
 					};
-
-				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
-					// Player two then recieves the results of the round
-					var roundResult = comparePlay();
-
-					if (roundResult === "One wins"){
-						$('win-status').text("Player One Wins!");
-					} else if (roundResult === "Two wins"){
-						$('win-status').text("Player Two Wins!");
-					} else if (roundResult === "Tie"){
-						$('win-status').text("This rounds a tie.");
-					};
-
-					// Game waits 2 seconds to allow players to see results of the round
-					// Database counters are then updated in preperation for the next round
-					setTimeout(function() { 
-						localRoundsRemaining--;
-						firebase.database().ref('activeGames/' + gamePath).update({
-								playerOneMove: "waiting",
-								playerTwoMove: "waiting",
-								roundWinner: roundResult,
-								roundsRemaining: localRoundsRemaining
-						});
-						$('#win-status').text("");
-					}, 2000);
 				};
 
 				// Updates displays
@@ -261,10 +284,6 @@
 				$('#player1-wins-display').text(gameObj.playerOnePoints);
 				$('#player2-wins-display').text(gameObj.playerTwoPoints);
 
-				// This checks it see if the game is over. It is a seperate if statement because the game might have just ended.
-				if (gameObj.roundsRemaining <= 0){
-					
-				};
 				console.log("Full run gameplay detect function")
 
 			}, function(error){
