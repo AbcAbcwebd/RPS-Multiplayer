@@ -132,6 +132,7 @@
 			*/
 			// Actual
 			database.ref('activeGames').on("value", function(snapshot){
+				console.log("Active games change detected")
 
 				// This maintains an array of users actively invovled in gameplay.
 				/*
