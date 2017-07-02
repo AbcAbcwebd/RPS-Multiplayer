@@ -328,13 +328,20 @@
 			player2Display.append(player2StatusDisplay);
 			player2Display.append(player2WinsDisplay);
 
-			var gameChatWindow = $('div').attr('id', 'game-chat-window');
+			var gameChatWindow = $('<div>').attr('id', 'game-chat-window');
+
+			var chatBox = $('<div>').attr('id', 'chat-box-div');
+			var chatInput = $('<input>').attr('type', 'text').attr('id', 'chat-box-input');
+			var chatSendButton = $('<button>').attr('id', 'chat-submit-btn').text("Send");
+			chatBox.append(chatInput);
+			chatBox.append(chatSendButton);
 
 			// Adds it all to the page
 			$('body').append(player1Display);
 			$('body').append(roundsLeftDisplay);
 			$('body').append(player2Display);
 			$('body').append(gameChatWindow);
+			$('body').append(chatBox);
 
 			// The function for actual game play is then called. 
 			console.log("About to start game play")
@@ -388,6 +395,11 @@
 				console.log("Player list item clicked")
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
+			});
+
+			$("body").on("click", "#chat-submit-btn", function(){
+				console.log("Button clicked")
+
 			});
 
 		});
@@ -485,6 +497,12 @@
 								playerTwoPoints: 0,
 								roundsRemaining: 10
 							});
+
+							// This sets up the chat functionality database.
+							firebase.database().ref('activeGameChat/' + gamePath).set({
+								messageCount: 0
+							});
+
 
 							startGame();
 						});
