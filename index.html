@@ -40,8 +40,9 @@
 		var localPlayer;
 		var localMove = "none";
 		var gameObj;
-//		var inGamePlay = [];
+		var inGamePlay = [];
 		var messageCount = 0;
+		var availableChallenges;
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -67,20 +68,24 @@
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
 			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
 			activeUsersDisplay.append(challengeInstructions);
-			// ATTN: This needs to be fixed. 
-			if (activeUserList.length === 0){
-				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
-				activeUsersDisplay.append(noChallengersWarning);
-			};
+			availableChallenges = 0;
 
 			for (var x = 0; x < activeUserList.length; x++){
 				// Adds all active users to list of competitors, except this windows current user.
-				if (activeUserList[x] != currentUser){
+				// The in game play array helps keep tabs on which users are busy at any given time. 
+				if (activeUserList[x] != currentUser && inGamePlay.indexOf(activeUserList[x]) < 0 && activeUserList[x] != "bump"){
+					availableChallenges++;
 					var newP = $('<p>').text(activeUserList[x]);
 					newP.attr("class", "player-list-item");
 					activeUsersDisplay.append(newP);
 				};
 			}
+
+			if (availableChallenges === 0){
+				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
+				activeUsersDisplay.append(noChallengersWarning);
+			};
+
 			$('#main-stage').append(activeUsersDisplay);
 		};
 
@@ -131,6 +136,8 @@
 		
 			database.ref('activeGames').on("value", function(snapshot){
 				console.log("Active games change detected")
+
+
 
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
@@ -331,8 +338,10 @@
 			$('#main-stage').remove();
 			$('#message-console').remove();
 
-			// This removes the player from the list of players looking for competitors. 
-//			activeUserPath.remove();
+			// This jogs the active users database so that users invovled in this new challenge are removed from the list on other users local system via client side arrays. 
+			firebase.database().ref('activeUsers/bump').set({
+		    	count: currentUser
+		  	});
 
 
 			// This generates elements for the new game play.
@@ -581,6 +590,21 @@
 		}, function(error){
 			console.log(error);
 			console.log("Error run")
+		});
+		
+		database.ref('activeGames').on("value", function(snapshot){
+			inGamePlay = [];
+			var gamePlayMass = snapshot.val();
+			for (var key in gamePlayMass) {
+				if (gamePlayMass.hasOwnProperty(key)) {
+				  	var busyPlayer1 = key.split("-")[0];
+				  	var busyPlayer2 = key.split("-")[1];
+				  	inGamePlay.push(busyPlayer1);
+				  	inGamePlay.push(busyPlayer2);
+				};
+			};
+		}, function(error){
+			console.log(error);
 		});
 
 		// This goes through and deletes challenges that are not being actively used. IE-- If one or both players are now offiline. 
