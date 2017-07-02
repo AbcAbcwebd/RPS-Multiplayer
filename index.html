@@ -41,6 +41,7 @@
 		var localMove = "none";
 		var gameObj;
 //		var inGamePlay = [];
+		var messageCount = 0;
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -289,6 +290,35 @@
 			}, function(error){
 				console.log(error);
 			}); 
+
+			// This block of code monitors the database for chat messages
+			database.ref('activeGameChat').on("value", function(snapshot){
+				chatObj = snapshot.val()[gamePath];
+				$('#game-chat-window').empty();
+	//			messageCount = chatObj.messageCount;
+			/*	for (var i = 1; i <= messageCount; i++){
+					var localChatMessage = chatObj[message + i];
+					console.log(localChatMessage)
+				} */
+				messageCount = 0;
+				for (var key in chatObj) {
+				  if (chatObj.hasOwnProperty(key)) {
+				  	var localChatFrom = chatObj[key].split("%")[0];
+				  	var localChatMessage = chatObj[key].split("%")[1];
+				  	var localMessageClass;
+				  	if (localChatFrom === currentUser){
+				  		localMessageClass = "sent-message";
+				  	} else {
+				  		localMessageClass = "recieved-message";
+				  	};
+				  	var displayMessage = $('<p>').html("<strong>" + localChatFrom + ":</strong> " + localChatMessage).attr('class', localMessageClass);
+				  	$('#game-chat-window').append(displayMessage);
+				  	messageCount++;
+				  };
+				};
+			}, function(error){
+				console.log(error);
+			});
 		};
 
 		function startGame(){
@@ -398,8 +428,15 @@
 			});
 
 			$("body").on("click", "#chat-submit-btn", function(){
-				console.log("Button clicked")
-
+				var message = $('#chat-box-input').val();
+				if (message.length > 0){
+					messageCount++;
+					firebase.database().ref('activeGameChat/' + gamePath).update({
+						["message" + messageCount]: currentUser + "%" + message,
+//						messageCount: messageCount
+					});
+				};
+				$('#chat-box-input').text("");
 			});
 
 		});
@@ -431,8 +468,8 @@
 	//		    if (inGamePlay.indexOf(key) < 0){
 			    	activeUserList.push(key);
 	//		    };
-			  }
-			}
+			  };
+			};
 
 			// If the current user list is currently being displayed, it will be updated.
 			if (displayUserList){
@@ -500,7 +537,7 @@
 
 							// This sets up the chat functionality database.
 							firebase.database().ref('activeGameChat/' + gamePath).set({
-								messageCount: 0
+//								messageCount: 0
 							});
 
 
