@@ -123,6 +123,8 @@
 		};
 
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
+		// This function should perhaps be broken up into smaller functions. 
+		// It has gotten big because much of the code within it needs access to the database object that is uses.
 		function gamePlay(){
 			console.log("Game play running")
 		
@@ -132,6 +134,11 @@
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
 				console.log(gameObj);
+
+				// Variables for this function 
+				var playerOneLocalPoints = gameObj.playerOnePoints;
+				var playerTwoLocalPoints = gameObj.playerTwoPoints;
+				var localRoundsRemaining = gameObj.roundsRemaining;
 				
 				// Adds names to player displays
 				$('#play1-title').text(gameObj.playerOne);
@@ -195,26 +202,42 @@
 					userTwoMove = gameObj.playerTwoMove;
 		
 					var roundResult = comparePlay();
-		
+					
+					// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. 
 					if (roundResult === "One wins"){
 						console.log("One wins")
 						$('win-status').text("Player One Wins!");
 						gameObj.roundWinner = "One";
-						gameObj.playerOnePoints++;
+						playerOneLocalPoints++;
+						firebase.database().ref('activeGames/' + gamePath).update({
+								playerOneMove: "waiting",
+								playerOnePoints: playerOneLocalPoints
+						});
 
 					} else if (roundResult === "Two wins"){
 						console.log("Two wins")
 						$('win-status').text("Player Two Wins!");
 						gameObj.roundWinner = "Two";
-						gameObj.playerTwoPoints++;
+						playerTwoLocalPoints++;
+						firebase.database().ref('activeGames/' + gamePath).update({
+								playerOneMove: "waiting",
+								playerTwoPoints: playerTwoLocalPoints
+						});
 
 					} else if (roundResult === "Tie"){
 						$('win-status').text("This rounds a tie.");
 						gameObj.roundWinner = "Tie";
 
 					};
+
+				/*	firebase.database().ref('activeGames/' + gamePath).update({
+						
+					}); */
+		//			return;
 				} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
 					// Player two then recieves the results of the round
+					var roundResult = comparePlay();
+
 					if (roundResult === "One wins"){
 						$('win-status').text("Player One Wins!");
 					} else if (roundResult === "Two wins"){
@@ -226,11 +249,15 @@
 					// Game waits 2 seconds to allow players to see results of the round
 					// Database counters are then updated in preperation for the next round
 					setTimeout(function() { 
-						gameObj.playerOneMove = "waiting";
-						gameObj.playerTwoMove = "waiting";
-						gameObj.roundWinner = "none";
-						gameObj.roundsRemaining--;
+						localRoundsRemaining--;
+						firebase.database().ref('activeGames/' + gamePath).update({
+								playerOneMove: "waiting",
+								playerTwoMove: "waiting",
+								roundWinner: roundResult,
+								roundsRemaining: localRoundsRemaining
+						});
 						$('#win-status').text("");
+		//				return;
 					}, 2000);
 				};
 
@@ -253,12 +280,12 @@
 				console.log("Full run gameplay detect function")
 
 				// For reference
-				database.ref('activeGames').on("value", function(snapshot){
+			/*	database.ref('activeGames').on("value", function(snapshot){
 					gameObjT = snapshot.val();
-					console.log(gameObjT);});
+					console.log(gameObjT);}); */
 			}, function(error){
 				console.log(error);
-			});
+			}); 
 		};
 
 		function startGame(){
