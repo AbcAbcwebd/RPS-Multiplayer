@@ -125,46 +125,14 @@
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		function gamePlay(){
 			console.log("Game play running")
-			/*
-			database.ref('activeGames').on("value", function(snapshot){
-				gameObj = snapshot.val();
-				console.log(gameObj);});
-			*/
-			// Actual
+		
 			database.ref('activeGames').on("value", function(snapshot){
 				console.log("Active games change detected")
 
-				// This maintains an array of users actively invovled in gameplay.
-				/*
-				inGamePlay = [];
-				for (var key in snapshot.val()) {
-				  if (snapshot.val().hasOwnProperty(key)) {
-				    inGamePlay.push(key);
-				  };
-				};
-				*/
-				// This seems to be causing problems
-				/*
-				var allGamesObj = snapshot.val();
-				inGamePlay = [];
-				for (var key in allGamesObj) {
-				  if (allGamesObj.hasOwnProperty(key)) {
-				    	console.log(key);
-				  }
-				}
-*/
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
 				console.log(gameObj);
 				
-
-			/*
-			// For reference
-			database.ref('activeGames').on("value", function(snapshot){
-				gameObjT = snapshot.val();
-				console.log(gameObjT);});
-			*/
-
 				// Adds names to player displays
 				$('#play1-title').text(gameObj.playerOne);
 				$('#play2-title').text(gameObj.playerTwo);
@@ -188,23 +156,6 @@
 
 				var otherPlayerWaiting = $('<p>').text("?").attr('class', 'wait-mark');
 
-/*
-				if (localMove != "none"){
-					console.log("Move detected");
-					if (localPlayer === "One"){
-							gameObj.playerOneMove = localMove;
-							localMove = "none";
-					} else if (localPlayer === "Two"){
-							gameObj.playerTwoMove = localMove;
-							localMove = "none";
-					}; 
-				};
-*/
-
-				// For reference
-	/*			database.ref('activeGames').on("value", function(snapshot){
-					gameObjT = snapshot.val();
-					console.log(gameObjT);}); */
 				
 				console.log("Starting game logic")
 				console.log("localPlayer: " + localPlayer);
@@ -242,19 +193,9 @@
 					// Both players have played.
 					userOneMove = gameObj.playerOneMove;
 					userTwoMove = gameObj.playerTwoMove;
-				/*
-					// For reference
-					database.ref('activeGames').on("value", function(snapshot){
-						gameObjT = snapshot.val();
-						console.log(gameObjT);});
-				*/
+		
 					var roundResult = comparePlay();
-				/*
-					// For reference
-					database.ref('activeGames').on("value", function(snapshot){
-						gameObjT = snapshot.val();
-						console.log(gameObjT);});
-				*/
+		
 					if (roundResult === "One wins"){
 						console.log("One wins")
 						$('win-status').text("Player One Wins!");
@@ -293,10 +234,12 @@
 					}, 2000);
 				};
 
+				/*
 				// For reference
 				database.ref('activeGames').on("value", function(snapshot){
 					gameObjT = snapshot.val();
 					console.log(gameObjT);});
+				*/
 
 				// This displays
 				$('#rounds-left-display').text(gameObj.roundsRemaining);
@@ -330,11 +273,7 @@
 
 			// This removes the player from the list of players looking for competitors. 
 //			activeUserPath.remove();
-/*
-			database.ref('activeGames').on("value", function(snapshot){
-				gameObj = snapshot.val();
-				console.log(gameObj);});
-*/
+
 
 			// This generates elements for the new game play.
 			// Player display
