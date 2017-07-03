@@ -45,6 +45,9 @@
 		var messageCount = 0;
 		var availableChallenges;
 
+		// Temporary array of users that had previously been removed from the active users list, because they started a game, but are now available again. 
+		var usersEndedGame = [];
+
 		// These variables are used for per round game logic
 		var userOneMove;
 		var userTwoMove;
@@ -128,6 +131,11 @@
 				// It's a tie
 				return "Tie";
 			};
+		};
+
+		// This is for re-adding users who had been marked in-active because they were busy with another game. 
+		function readdActiveUser(){
+			
 		};
 
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
@@ -465,6 +473,8 @@
 			// This click event is for a button displayed at the end of the game to play again. 
 			$("body").on("click", "#play-again-btn", function(){
 				$('body'),empty();
+		/*		var userIndex = inGamePlay.indexOf(currentUser);
+				inGamePlay.splice(userIndex, 1); */
 				generateActiveUsersList();
 			});
 
