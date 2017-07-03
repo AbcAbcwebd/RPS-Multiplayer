@@ -574,6 +574,8 @@
 								roundsRemaining: 10
 							});
 
+							firebase.database().ref('activeGames/' + gamePath).onDisconnect().remove();
+
 							// This sets up the chat functionality database.
 							firebase.database().ref('activeGameChat/' + gamePath).set({
 //								messageCount: 0
