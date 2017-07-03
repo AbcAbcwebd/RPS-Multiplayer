@@ -5,7 +5,7 @@ var userSet = false;
 // Dynamically generated so that it can more easily be removed and readed to the page as necesary. 
 function getUserName(){
 	$('#account-display').empty();
-	var instructions = $('<p>').text("Please pick a screen name to start playing.");
+	var instructions = $('<p>').text("Please pick a screen name to start playing.").attr("id", "name-prompt");
 	var nameInput = $('<input>').attr("type", "text");
 	nameInput.attr("id", "name-input");
 	var submitButton = $('<button>').text("Set Name");
@@ -13,6 +13,7 @@ function getUserName(){
 	var errorDisplay = $('<p>').attr("id", "error-display");
 	$('#account-display').append(instructions);
 	$('#account-display').append(nameInput);
+	$('#account-display').append('<br>');
 	$('#account-display').append(submitButton);
 	$('#account-display').append(errorDisplay);
 	$('#account-display').attr("class", "display-item");

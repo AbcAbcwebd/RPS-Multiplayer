@@ -7,6 +7,7 @@
 	<script src="https://code.jquery.com/jquery-3.1.1.js"></script>
 	<script src="assets/javascript/app.js"></script>
 	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+	<link href="https://fonts.googleapis.com/css?family=Merriweather|Oswald|Russo+One" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
 <body>
@@ -64,9 +65,10 @@
 		// This sets things up for the user to pick a challenger
 		function generateActiveUsersList(){
 			console.log("Generating active user list")
+			$('#account-display').css('margin-top', '50px');
 			$('#active-user-display').remove();
 			var activeUsersDisplay = $('<div>').attr("id", "active-user-display");
-			var challengeInstructions = $('<p>').text("Who would you like to challenge?");
+			var challengeInstructions = $('<p>').text("Who would you like to challenge?").attr('id', 'challenge-prompt');
 			activeUsersDisplay.append(challengeInstructions);
 			availableChallenges = 0;
 
@@ -82,7 +84,7 @@
 			}
 
 			if (availableChallenges === 0){
-				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!");
+				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!").attr('id', 'no-challenger-message');
 				activeUsersDisplay.append(noChallengersWarning);
 			};
 
@@ -434,6 +436,7 @@
 				console.log("Player list item clicked")
 				var enemyTarget = $(this)[0].innerText;
 				initChallenge(enemyTarget);
+				$(this).text(enemyTarget + " has been challenged.")
 			});
 
 			$("body").on("click", "#chat-submit-btn", function(){
