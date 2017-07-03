@@ -321,7 +321,9 @@
 				  		localMessageClass = "recieved-message";
 				  	};
 				  	var displayMessage = $('<p>').html("<strong>" + localChatFrom + ":</strong> " + localChatMessage).attr('class', localMessageClass);
-				  	$('#game-chat-window').append(displayMessage);
+				  	var holderDiv = $('<div>').attr('class', 'spacer-div');
+				  	holderDiv.append(displayMessage);
+				  	$('#game-chat-window').append(holderDiv);
 				  	messageCount++;
 				  };
 				};
