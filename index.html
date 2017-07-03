@@ -175,13 +175,15 @@
 
 				// This checks it see if the game is over and makes arrangements accordinly. 
 				if (gameObj.roundsRemaining <= 0){
-					$('#rounds-left-display').text("0");
+					$('#rounds-left-display-span').text("0");
 					if (playerOneLocalPoints > playerTwoLocalPoints){
 						$('#player1-status-display').text(gameObj.playerOne + " wins!");
 						$('#player2-status-display').text(gameObj.playerOne + " wins!");
+						$('#win-status').text(gameObj.playerOne + " wins!" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 					} else if (playerOneLocalPoints < playerTwoLocalPoints){
 						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
 						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
+						$('#win-status').text(gameObj.playerTwo + " wins!" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 					} else if (playerOneLocalPoints === playerTwoLocalPoints){
 						$('#player1-status-display').text("Tie! Preparing bonus round...");
 						$('#player2-status-display').text("Tie! Preparing bonus round...");
@@ -234,11 +236,12 @@
 						userTwoMove = gameObj.playerTwoMove;
 			
 						var roundResult = comparePlay();
+						console.log(roundResult)
 						
 						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. 
 						if (roundResult === "One wins"){
 							console.log("One wins")
-							$('win-status').text("Player One Wins!");
+							$('#win-status').text("Player One Wins!");
 							gameObj.roundWinner = "One";
 							playerOneLocalPoints++;
 							firebase.database().ref('activeGames/' + gamePath).update({
@@ -248,7 +251,7 @@
 
 						} else if (roundResult === "Two wins"){
 							console.log("Two wins")
-							$('win-status').text("Player Two Wins!");
+							$('#win-status').text("Player Two Wins!");
 							gameObj.roundWinner = "Two";
 							playerTwoLocalPoints++;
 							firebase.database().ref('activeGames/' + gamePath).update({
@@ -257,21 +260,27 @@
 							});
 
 						} else if (roundResult === "Tie"){
-							$('win-status').text("This rounds a tie.");
+							console.log("Round result: " + roundResult)
+							console.log("Tie")
+							$('#win-status').text("This rounds a tie.");
 							gameObj.roundWinner = "Tie";
 
 						};
 
 					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
 						// Player two then recieves the results of the round
+						userOneMove = gameObj.playerOneMove;
+						userTwoMove = gameObj.playerTwoMove;
+
 						var roundResult = comparePlay();
+						console.log("Round result: " + roundResult);
 
 						if (roundResult === "One wins"){
-							$('win-status').text("Player One Wins!");
+							$('#win-status').text("Player One Wins!");
 						} else if (roundResult === "Two wins"){
-							$('win-status').text("Player Two Wins!");
+							$('#win-status').text("Player Two Wins!");
 						} else if (roundResult === "Tie"){
-							$('win-status').text("This rounds a tie.");
+							$('#win-status').text("This rounds a tie.");
 						};
 
 						// Game waits 2 seconds to allow players to see results of the round
@@ -290,7 +299,7 @@
 				};
 
 				// Updates displays
-				$('#rounds-left-display').text(gameObj.roundsRemaining);
+				$('#rounds-left-display-span').text(gameObj.roundsRemaining);
 				$('#player1-wins-display').text(gameObj.playerOnePoints);
 				$('#player2-wins-display').text(gameObj.playerTwoPoints);
 
@@ -359,8 +368,8 @@
 			player1Display.append(player1WinsDisplay);
 
 			// Generates rounds lett message
-			var roundsLeftDisplay = $('<h3>').attr('id', 'rounds-left-display');
-			roundsLeftDisplay.html("Rounds remaining: <span id='rounds-left-display-span'>10</span><br><span id='win-status'></span>");
+			var roundsLeftDisplay = $('<div>').attr('id', 'rounds-left-display');
+			roundsLeftDisplay.html("<h3>Rounds remaining: <span id='rounds-left-display-span'>10</span></h3><br><p id='win-status'></p>");
 
 			// Player display
 			var player2Display = $('<div>').attr('id', 'player2-display');
@@ -380,8 +389,8 @@
 			chatBox.append(chatSendButton);
 
 			// Adds it all to the page
-			$('body').append(player1Display);
 			$('body').append(roundsLeftDisplay);
+			$('body').append(player1Display);
 			$('body').append(player2Display);
 			$('body').append(gameChatWindow);
 			$('body').append(chatBox);
@@ -451,6 +460,12 @@
 					});
 				};
 				$('#chat-box-input').val("");
+			});
+
+			// This click event is for a button displayed at the end of the game to play again. 
+			$("body").on("click", "#play-again-btn", function(){
+				$('body'),empty();
+				generateActiveUsersList();
 			});
 
 		});
