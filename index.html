@@ -538,10 +538,10 @@
 
 			// This click event is for a button displayed at the end of the game to play again. 
 			$("body").on("click", "#play-again-btn", function(){
-				$('body').empty();
+				//$('body').empty();
 		/*		var userIndex = inGamePlay.indexOf(currentUser);
 				inGamePlay.splice(userIndex, 1); */
-				gameEnded = true;
+		/*		gameEnded = true;
 				clearGameObj();
 
 				// Re-adds previously cleared HTML elements.
@@ -554,7 +554,9 @@
 				$('body').append(messageConsole);
 
 				displayUserList = true;
-				generateActiveUsersList();
+				generateActiveUsersList(); */
+
+				location.reload();
 			});
 
 		});
