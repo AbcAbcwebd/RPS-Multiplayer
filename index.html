@@ -44,7 +44,7 @@
 		var inGamePlay = [];
 		var messageCount = 0;
 		var availableChallenges;
-//		var gameEnded = false;
+		var gameEnded = false;
 
 		// This is a special variable used to ensure player one only increases score by one point per win. 
 		// It is switched to true between the time that player one tabulates score and player two resets object move variables. 
@@ -171,10 +171,10 @@
 			database.ref('activeGames').on("value", function(snapshot){
 				console.log("Active games change detected")
 
-	//			if(gameEnded){
-	//				console.log("Killing game play function")
-	//				return;
-	//			}
+				if(gameEnded){
+					console.log("Killing game play function")
+					return;
+				};
 
 				gameObj = snapshot.val()[gamePath];
 				console.log(snapshot);
@@ -219,13 +219,11 @@
 						$('#win-status').empty();
 						$('#win-status').append("<p>" + gameObj.playerOne + " Wins</p>" + "<p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 						$('#account-display').css('margin-top', '0px');
-		//				gameEnded = true;
 					} else if (playerOneLocalPoints < playerTwoLocalPoints){
 						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
 						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
 						$('#win-status').append("<p>" + gameObj.playerTwo + " Wins</p>" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 						$('#account-display').css('margin-top', '20px');
-		//				gameEnded = true;
 					} else if (playerOneLocalPoints === playerTwoLocalPoints){
 						$('#player1-status-display').text("Tie! Preparing bonus round...");
 						$('#player2-status-display').text("Tie! Preparing bonus round...");
@@ -469,7 +467,7 @@
 
 			// Things have been setup and the game play function should be allowed to run. 
 			// This exists to keep the game play functioning from continuing to run between games. 
-//			gameEnded = false;
+			gameEnded = false;
 
 			// The function for actual game play is then called. 
 			console.log("About to start game play")
@@ -543,12 +541,14 @@
 				$('body').empty();
 		/*		var userIndex = inGamePlay.indexOf(currentUser);
 				inGamePlay.splice(userIndex, 1); */
+				gameEnded = true;
 				clearGameObj();
 
 				// Re-adds previously cleared HTML elements.
 				var accountDisplay = $('<div>').attr('id', 'account-display');
 				var mainStage = $('<div>').attr('id', 'main-stage');
 				var messageConsole = $('<div>').attr('id', 'message-console');
+				accountDisplay.hide();
 				$('body').append(accountDisplay);
 				$('body').append(mainStage);
 				$('body').append(messageConsole);
