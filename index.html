@@ -298,7 +298,7 @@
 						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. In this case 'paused' is used instead of 'waiting'. Only player one logic will detect 'pause.' That way, player two logic continue will continue. Player 2 logic will change 'paused' to 'waiting' when it is complete. 
 						if (roundResult === "One wins"){
 							console.log("One wins")
-							$('#win-status').text("Player One Wins!");
+							$('#win-status').text(gameObj.playerOne + " Wins!");
 							gameObj.roundWinner = "One";
 							playerOneLocalPoints++;
 							blockOn = true;
@@ -308,7 +308,7 @@
 
 						} else if (roundResult === "Two wins"){
 							console.log("Two wins")
-							$('#win-status').text("Player Two Wins!");
+							$('#win-status').text(gameObj.playerTwo + " Wins!");
 							gameObj.roundWinner = "Two";
 							playerTwoLocalPoints++;
 							blockOn = true;
@@ -339,9 +339,9 @@
 						console.log("Round result: " + roundResult);
 
 						if (roundResult === "One wins"){
-							$('#win-status').text("Player One Wins!");
+							$('#win-status').text(gameObj.playerOne + " Wins!");
 						} else if (roundResult === "Two wins"){
-							$('#win-status').text("Player Two Wins!");
+							$('#win-status').text(gameObj.playerTwo + " Wins!");
 						} else if (roundResult === "Tie"){
 							$('#win-status').text("This rounds a tie.");
 						};
