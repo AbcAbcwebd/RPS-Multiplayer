@@ -244,3 +244,63 @@ strong {
 	text-align: center;
 	margin-bottom: 15px;
 }
+
+@media only screen and (max-width: 600px) {
+	
+	#player1-display {
+		margin-left: 15px;
+	}
+
+	#player2-display {
+		margin-right: 15px;
+	}
+
+	#account-display {
+		margin-left: 3%;
+		width: 85%;
+	}
+
+	#name-input {
+		width: 90%;
+	}
+
+	#name-prompt {
+		text-align: center;
+		padding-left: 0px;
+	}
+
+	#set-name-button {
+		margin-left: 40%;
+	}
+}
+
+@media only screen and (max-width: 1000px) {
+
+	#chat-submit-btn {
+		margin-left: 25%;
+		width: 50%;
+	}
+
+	#player1-display { 
+		max-width: 30%;
+	};
+
+	#player2-display { 
+		max-width: 30%;
+	};
+
+}
+
+@media only screen and (min-width: 768px) {
+	#player1-display {
+		margin-left: 45px;
+		zoom: 1.25;
+    	-moz-transform: scale(1.25);
+	}
+
+	#player2-display {
+		margin-right: 45px;
+		zoom: 1.25;
+    	-moz-transform: scale(1.25);
+	}
+}
