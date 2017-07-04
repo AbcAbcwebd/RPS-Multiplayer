@@ -214,24 +214,25 @@
 					$('#rounds-left-display-span').text("0");
 					if (playerOneLocalPoints > playerTwoLocalPoints){
 						
-						$('#player1-status-display').text(gameObj.playerOne + " wins!");
-						$('#player2-status-display').text(gameObj.playerOne + " wins!");
+						$('#player1-status-display').text(gameObj.playerOne + " wins game!");
+						$('#player2-status-display').text(gameObj.playerOne + " wins game!");
 						$('#win-status').empty();
-						$('#win-status').append("<p>" + gameObj.playerOne + " Wins</p>" + "<p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#win-status').append("<p>" + gameObj.playerOne + " Wins game</p>" + "<p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 						$('#account-display').css('margin-top', '0px');
 					} else if (playerOneLocalPoints < playerTwoLocalPoints){
-						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
-						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
-						$('#win-status').append("<p>" + gameObj.playerTwo + " Wins</p>" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#player1-status-display').text(gameObj.playerTwo + " wins game!");
+						$('#player2-status-display').text(gameObj.playerTwo + " wins game!");
+						$('#win-status').append("<p>" + gameObj.playerTwo + " Wins game</p>" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 						$('#account-display').css('margin-top', '20px');
 					} else if (playerOneLocalPoints === playerTwoLocalPoints){
 						$('#player1-status-display').text("Tie! Preparing bonus round...");
 						$('#player2-status-display').text("Tie! Preparing bonus round...");
+						$('#win-status').text("Going into overtime...");
 						setTimeout(function() { 
 							firebase.database().ref('activeGames/' + gamePath).update({
 									roundsRemaining: 1
 							});
-
+							$('#win-status').text("Bonus Round");
 						}, 2000);
 					};	
 				// If the game is not over, functionality continues. 
@@ -298,7 +299,7 @@
 						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. In this case 'paused' is used instead of 'waiting'. Only player one logic will detect 'pause.' That way, player two logic continue will continue. Player 2 logic will change 'paused' to 'waiting' when it is complete. 
 						if (roundResult === "One wins"){
 							console.log("One wins")
-							$('#win-status').text(gameObj.playerOne + " Wins!");
+							$('#win-status').text(gameObj.playerOne + " wins round!");
 							gameObj.roundWinner = "One";
 							playerOneLocalPoints++;
 							blockOn = true;
@@ -308,7 +309,7 @@
 
 						} else if (roundResult === "Two wins"){
 							console.log("Two wins")
-							$('#win-status').text(gameObj.playerTwo + " Wins!");
+							$('#win-status').text(gameObj.playerTwo + " wins round!");
 							gameObj.roundWinner = "Two";
 							playerTwoLocalPoints++;
 							blockOn = true;
