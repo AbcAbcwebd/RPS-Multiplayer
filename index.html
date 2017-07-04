@@ -44,6 +44,11 @@
 		var inGamePlay = [];
 		var messageCount = 0;
 		var availableChallenges;
+		var gameEnded = false;
+
+		// This is a special variable used to ensure player one only increases score by one point per win. 
+		// It is switched to true between the time that player one tabulates score and player two resets object move variables. 
+		var blockOn = false;
 
 		// Temporary array of users that had previously been removed from the active users list, because they started a game, but are now available again. 
 //		var usersEndedGame = [];
@@ -166,6 +171,11 @@
 			database.ref('activeGames').on("value", function(snapshot){
 				console.log("Active games change detected")
 
+				if(gameEnded){
+					console.log("Killing game play function")
+					return;
+				}
+
 
 
 				gameObj = snapshot.val()[gamePath];
@@ -205,14 +215,20 @@
 					console.log("Rounds down to zero.")
 					$('#rounds-left-display-span').text("0");
 					if (playerOneLocalPoints > playerTwoLocalPoints){
+						gameEnded = true;
 						$('#player1-status-display').text(gameObj.playerOne + " wins!");
 						$('#player2-status-display').text(gameObj.playerOne + " wins!");
 						$('#win-status').empty();
 						$('#win-status').append("<p>" + gameObj.playerOne + " Wins</p>" + "<p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#account-display').css('margin-top', '20px');
+						return
 					} else if (playerOneLocalPoints < playerTwoLocalPoints){
+						gameEnded = true;
 						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
 						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
 						$('#win-status').append("<p>" + gameObj.playerTwo + " Wins</p>" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#account-display').css('margin-top', '20px');
+						return
 					} else if (playerOneLocalPoints === playerTwoLocalPoints){
 						$('#player1-status-display').text("Tie! Preparing bonus round...");
 						$('#player2-status-display').text("Tie! Preparing bonus round...");
@@ -232,6 +248,9 @@
 					// Keeps track of whose turn it is and monitors game status.
 					if (localPlayer === "One" && gameObj.playerOneMove === "waiting"){
 						console.log("First running")
+
+						// If 2nd round or later, player 2's computer has reset move variables and player one's score count block should be lifted. (See where variable is defined above.)
+						blockOn = false;
 						// Player one should be given play choices.
 						$('#player1-status-display').html(itemChoices);
 						$('#player2-status-display').html(otherPlayerWaiting);
@@ -258,8 +277,12 @@
 						$('#player2-status-display').html("<p>Waiting on " + gameObj.playerOne + "</p>");
 						$('#player1-status-display').html(otherPlayerWaiting);
 					// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
-					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One" && gameObj.playerOneMove != "paused"){
+					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One" && !blockOn){
 						console.log("Fifth")
+
+						// Gameplay choices should no longer be displayed.
+						$('#player1-status-display').empty();
+
 						// Both players have played.
 						userOneMove = gameObj.playerOneMove;
 						userTwoMove = gameObj.playerTwoMove;
@@ -273,8 +296,8 @@
 							$('#win-status').text("Player One Wins!");
 							gameObj.roundWinner = "One";
 							playerOneLocalPoints++;
+							blockOn = true;
 							firebase.database().ref('activeGames/' + gamePath).update({
-									playerOneMove: "paused",
 									playerOnePoints: playerOneLocalPoints
 							});
 
@@ -283,8 +306,8 @@
 							$('#win-status').text("Player Two Wins!");
 							gameObj.roundWinner = "Two";
 							playerTwoLocalPoints++;
+							blockOn = true;
 							firebase.database().ref('activeGames/' + gamePath).update({
-									playerOneMove: "paused",
 									playerTwoPoints: playerTwoLocalPoints
 							});
 
@@ -297,6 +320,10 @@
 						};
 
 					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "Two"){
+
+						// Gameplay choices should no longer be displayed.
+						$('#player2-status-display').empty();
+
 						// Player two then recieves the results of the round
 						userOneMove = gameObj.playerOneMove;
 						userTwoMove = gameObj.playerTwoMove;
@@ -315,6 +342,7 @@
 						// Game waits 2 seconds to allow players to see results of the round
 						// Database counters are then updated in preperation for the next round
 						setTimeout(function() { 
+							console.log("Running timeout function")
 							localRoundsRemaining--;
 							firebase.database().ref('activeGames/' + gamePath).update({
 									playerOneMove: "waiting",
@@ -328,6 +356,7 @@
 							if (localRoundsRemaining <= 0){
 								gamePlay();
 							};
+							console.log("Timeout function complete")
 						}, 2000);
 					};
 				};
@@ -429,6 +458,10 @@
 			$('body').append(gameChatWindow);
 			$('body').append(chatBox);
 
+			// Things have been setup and the game play function should be allowed to run. 
+			// This exists to keep the game play functioning from continuing to run between games. 
+			gameEnded = false;
+
 			// The function for actual game play is then called. 
 			console.log("About to start game play")
 	/*		database.ref('activeGames').on("value", function(snapshot){
@@ -502,6 +535,7 @@
 		/*		var userIndex = inGamePlay.indexOf(currentUser);
 				inGamePlay.splice(userIndex, 1); */
 				clearGameObj();
+				displayUserList = true;
 				generateActiveUsersList();
 			});
 
