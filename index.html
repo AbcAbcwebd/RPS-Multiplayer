@@ -46,7 +46,7 @@
 		var availableChallenges;
 
 		// Temporary array of users that had previously been removed from the active users list, because they started a game, but are now available again. 
-		var usersEndedGame = [];
+//		var usersEndedGame = [];
 
 		// These variables are used for per round game logic
 		var userOneMove;
@@ -74,6 +74,7 @@
 			var challengeInstructions = $('<p>').text("Who would you like to challenge?").attr('id', 'challenge-prompt');
 			activeUsersDisplay.append(challengeInstructions);
 			availableChallenges = 0;
+			console.log("Active user list HTML setup.")
 
 			for (var x = 0; x < activeUserList.length; x++){
 				// Adds all active users to list of competitors, except this windows current user.
@@ -84,7 +85,7 @@
 					newP.attr("class", "player-list-item");
 					activeUsersDisplay.append(newP);
 				};
-			}
+			};
 
 			if (availableChallenges === 0){
 				var noChallengersWarning = $('<p>').text("Sorry, no one's here for you to challenge!").attr('id', 'no-challenger-message');
@@ -133,10 +134,28 @@
 			};
 		};
 
-		// This is for re-adding users who had been marked in-active because they were busy with another game. 
-		function readdActiveUser(){
-			
+		// This function allows the game to delete the active game object to clear up storage space and allow names to be re-used.
+		function clearGameObj(){
+			console.log("Clear game obj function running.")
+			firebase.database().ref('activeGames/' + gamePath).remove();
+
+			// Clears out variables as well
+			gameChallenger;
+			gamePath;
+			localPlayer;
+			localMove = "none";
+			gameObj;
+			messageCount = 0;
+			availableChallenges;
+			userOneMove;
+			userTwoMove;
+			displayUserList = true;
 		};
+
+		// This is for re-adding users who had been marked in-active because they were busy with another game. 
+/*		function readdActiveUser(){
+			
+		}; */
 
 		// This function represents the meat of game play. It is the part of the app that monitors the game play JSON object for changes and calls additional functions as necesary. 
 		// This function should perhaps be broken up into smaller functions. 
@@ -183,15 +202,17 @@
 
 				// This checks it see if the game is over and makes arrangements accordinly. 
 				if (gameObj.roundsRemaining <= 0){
+					console.log("Rounds down to zero.")
 					$('#rounds-left-display-span').text("0");
 					if (playerOneLocalPoints > playerTwoLocalPoints){
 						$('#player1-status-display').text(gameObj.playerOne + " wins!");
 						$('#player2-status-display').text(gameObj.playerOne + " wins!");
-						$('#win-status').text(gameObj.playerOne + " wins!" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#win-status').empty();
+						$('#win-status').append("<p>" + gameObj.playerOne + " Wins</p>" + "<p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 					} else if (playerOneLocalPoints < playerTwoLocalPoints){
 						$('#player1-status-display').text(gameObj.playerTwo + " wins!");
 						$('#player2-status-display').text(gameObj.playerTwo + " wins!");
-						$('#win-status').text(gameObj.playerTwo + " wins!" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
+						$('#win-status').append("<p>" + gameObj.playerTwo + " Wins</p>" + "<br><br><p>Want to play again?</p><button id='play-again-btn'>Yes!</button>");
 					} else if (playerOneLocalPoints === playerTwoLocalPoints){
 						$('#player1-status-display').text("Tie! Preparing bonus round...");
 						$('#player2-status-display').text("Tie! Preparing bonus round...");
@@ -237,7 +258,7 @@
 						$('#player2-status-display').html("<p>Waiting on " + gameObj.playerOne + "</p>");
 						$('#player1-status-display').html(otherPlayerWaiting);
 					// Round tabulation is always done on user one's machine. This is to avoid duplicate database submission as well as unnecesarily tying up user computer power.
-					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One"){
+					} else if (gameObj.playerOneMove != "waiting" && gameObj.playerTwoMove != "waiting" && localPlayer === "One" && gameObj.playerOneMove != "paused"){
 						console.log("Fifth")
 						// Both players have played.
 						userOneMove = gameObj.playerOneMove;
@@ -246,14 +267,14 @@
 						var roundResult = comparePlay();
 						console.log(roundResult)
 						
-						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. 
+						// This updates point values. Important that player move be updated before point values in order to avoid an infinity loop. In this case 'paused' is used instead of 'waiting'. Only player one logic will detect 'pause.' That way, player two logic continue will continue. Player 2 logic will change 'paused' to 'waiting' when it is complete. 
 						if (roundResult === "One wins"){
 							console.log("One wins")
 							$('#win-status').text("Player One Wins!");
 							gameObj.roundWinner = "One";
 							playerOneLocalPoints++;
 							firebase.database().ref('activeGames/' + gamePath).update({
-									playerOneMove: "waiting",
+									playerOneMove: "paused",
 									playerOnePoints: playerOneLocalPoints
 							});
 
@@ -263,7 +284,7 @@
 							gameObj.roundWinner = "Two";
 							playerTwoLocalPoints++;
 							firebase.database().ref('activeGames/' + gamePath).update({
-									playerOneMove: "waiting",
+									playerOneMove: "paused",
 									playerTwoPoints: playerTwoLocalPoints
 							});
 
@@ -302,6 +323,11 @@
 									roundsRemaining: localRoundsRemaining
 							});
 							$('#win-status').text("");
+
+							// This recalls the function if rounds left is 0 or less so that player two's system will detect the end of game logic at the start of this function. 
+							if (localRoundsRemaining <= 0){
+								gamePlay();
+							};
 						}, 2000);
 					};
 				};
@@ -472,9 +498,10 @@
 
 			// This click event is for a button displayed at the end of the game to play again. 
 			$("body").on("click", "#play-again-btn", function(){
-				$('body'),empty();
+				$('body').empty();
 		/*		var userIndex = inGamePlay.indexOf(currentUser);
 				inGamePlay.splice(userIndex, 1); */
+				clearGameObj();
 				generateActiveUsersList();
 			});
 
@@ -574,6 +601,7 @@
 								roundsRemaining: 10
 							});
 
+							// Game object should be deleted when the users disconnect. 
 							firebase.database().ref('activeGames/' + gamePath).onDisconnect().remove();
 
 							// This sets up the chat functionality database.
